@@ -8,10 +8,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 
@@ -20,7 +18,7 @@ class Server {
 
 	public static void main(String args[]) {
 		try {
-			System.out.println("Running. Awaiting event source and client connection...");
+			System.out.println("Running. Awaiting event source connection...");
 			Socket eventSource = new ServerSocket(9090).accept();
 
 
@@ -37,7 +35,7 @@ class Server {
 				if (clientSocketChannel != null) {
 					acceptNewClients(clientSocketChannel.socket(), clients);
 				}
-				//enqueueEvents(eventSource, eventQueue);
+				enqueueEvents(eventSource, eventQueue);
 			}
 			// TODO close all the sockets
 		} catch (Exception e) {
@@ -56,8 +54,10 @@ class Server {
 
 	private static void enqueueEvents(Socket eventSource, Queue<String> eventQueue) throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(eventSource.getInputStream()));
-		String event = in.readLine();
-		System.out.println("Event:" + event);
-		eventQueue.add(event);
+		if (in.ready()) {
+			String event = in.readLine();
+			System.out.println("Event:" + event);
+			eventQueue.add(event);
+		}
 	}
 }
