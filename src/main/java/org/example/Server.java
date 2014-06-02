@@ -3,10 +3,10 @@ package org.example;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
@@ -15,11 +15,6 @@ import java.util.Map;
 import java.util.Set;
 
 class Server {
-
-	private static final int DEBUG_USER_ID = 103;
-	private static final int ANOTHER_DEBUG_USER_ID = 783;
-	private static final int FOO = 240;
-
 	public static void main(String args[]) {
 		try {
 			System.out.print("Running. Awaiting event source connection... ");
@@ -63,19 +58,14 @@ class Server {
 	private static void enqueueNextBatchOfEvents(Socket eventSource, Map<Long, String> eventQueue) throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(eventSource.getInputStream()));
 		if (in.ready()) {
-			System.out.print("Events:");
+			//System.out.print("Events:");
 			while (in.ready()) {
 				String event = in.readLine();
 				long seqNo = Long.parseLong(event.split("\\|")[0]);
-				if (event.contains(String.valueOf(DEBUG_USER_ID)) ||
-						event.contains(String.valueOf(ANOTHER_DEBUG_USER_ID)) ||
-						event.contains(String.valueOf(FOO)) ||
-						event.contains("B")) {
-					System.out.print(event + ",");
-				}
+				//System.out.print(event + ",");
 				eventQueue.put(seqNo, event);
 			}
-			System.out.println();
+			//System.out.println();
 		}
 	}
 
@@ -89,7 +79,7 @@ class Server {
 					throw new Error("No event found for " + lastDispatchedSeqNo);
 				}
 				//System.out.print(lastDispatchedSeqNo + ",");
-				dispatch(event, clients, followerToFollowables);
+				dispatch(event, clients, followerToFollowables, lastDispatchedSeqNo);
 				eventQueue.remove(lastDispatchedSeqNo);
 			}
 			//System.out.println();
@@ -122,7 +112,7 @@ class Server {
 
 	}
 
-	private static void dispatch(String event, Map<Integer, SocketChannel> clients, Map<Integer, Set<Integer>> followerToFollowables) throws IOException {
+	private static void dispatch(String event, Map<Integer, SocketChannel> clients, Map<Integer, Set<Integer>> followedToFollowers, long lastDispatchedSeqNo) throws IOException {
 		String[] parts = event.split("\\|");
 		String type = parts[1];
 		Integer fromUserId = parts.length <= 2 ? null : Integer.valueOf(parts[2]);
@@ -130,12 +120,12 @@ class Server {
 
 		switch (type) {
 			case "F":
-				if (!followerToFollowables.containsKey(fromUserId)) {
+				if (!followedToFollowers.containsKey(toUserId)) {
 					Set<Integer> followers = new HashSet<>();
-					followers.add(toUserId);
-					followerToFollowables.put(fromUserId, followers);
+					followers.add(fromUserId);
+					followedToFollowers.put(toUserId, followers);
 				} else {
-					followerToFollowables.get(fromUserId).add(toUserId);
+					followedToFollowers.get(toUserId).add(fromUserId);
 				}
 				writeStringToSocket(toUserId, event, clients);
 				break;
@@ -144,6 +134,7 @@ class Server {
 				writeStringToSocket(toUserId, event, clients);
 				break;
 			case "U":
+				followedToFollowers.get(toUserId).remove(fromUserId);
 				break; // TODO follow up desired behavior when a message is sent to someone without following
 			case "B":
 				for (Integer clientId : clients.keySet()) {
@@ -151,7 +142,7 @@ class Server {
 				}
 				break;
 			case "S":
-				Set<Integer> toUserIds = followerToFollowables.get(fromUserId);
+				Set<Integer> toUserIds = followedToFollowers.get(fromUserId);
 				if (toUserIds != null) {
 					for (int recipient : toUserIds) {
 						writeStringToSocket(recipient, event, clients);
@@ -163,32 +154,20 @@ class Server {
 		}
 	}
 
-	// TODO and what if the recipient is not connected? re-enqueue or drop
 	private static void writeStringToSocket(Integer clientId, String event, Map<Integer, SocketChannel> clients) throws IOException {
 		if (clientId != null) {
 			SocketChannel client = clients.get(clientId);
 			if (client != null && client.isConnected()) {
-				ByteBuffer buf = ByteBuffer.allocate(48);
-				buf.clear();
-				buf.put((event + "\r\n").getBytes());
-				client.write(buf);
-				if (clientId == DEBUG_USER_ID
-						|| event.contains(String.valueOf(ANOTHER_DEBUG_USER_ID))
-						|| event.contains(String.valueOf(FOO))
-
-						) {
-					System.out.println("dispatched: " + event + "  to client " + clientId);
-				}
+				PrintWriter out = new PrintWriter(client.socket().getOutputStream(), true);
+				out.println(event);
+				//System.out.println("dispatched: " + event + "  to client " + clientId);
 			} else {
-				if (clientId == DEBUG_USER_ID || event.contains(String.valueOf(ANOTHER_DEBUG_USER_ID))
-						|| event.contains(String.valueOf(FOO))) {
-					System.out.println("Client not around to recieve message: " + clientId);
-					System.out.println("Dropping event: " + event + " to user " + clientId);
-				}
+				//System.out.println("Client not around to recieve message: " + clientId);
+				//System.out.println("Dropping event: " + event + " to user " + clientId);
 				clients.remove(clientId);
 			}
 		} else {
-			System.out.println("Client not registered: " + clientId);
+			//System.out.println("Client not registered: " + clientId);
 		}
 	}
 }
