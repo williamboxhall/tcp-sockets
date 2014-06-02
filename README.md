@@ -46,13 +46,13 @@ required or allowed.
 There are five possible events. The table below describe payloads
 sent by the *event source* and what they represent:
 
-| Payload    | Sequence #| Type         | From User Id | To User Id |
-|------------|-----------|--------------|--------------|------------|
-|666|F|60|50 | 666       | Follow       | 60           | 50         |
-|1|U|12|9    | 1         | Unfollow     | 12           | 9          |
-|542532|B    | 542532    | Broadcast    | -            | -          |
-|43|P|32|56  | 43        | Private Msg  | 32           | 56         |
-|634|S|32    | 634       | Status Update| 32           | -          |
+| Payload                   | Seq #  | Type         | From User Id | To User Id |
+|---------------------------|--------|--------------|--------------|------------|
+|666&#124;F&#124;60&#124;50 | 666    | Follow       | 60           | 50         |
+|1&#124;U&#124;12&#124;9    | 1      | Unfollow     | 12           | 9          |
+|542532&#124;B              | 542532 | Broadcast    | -            | -          |
+|43&#124;P&#124;32&#124;56  | 43     | Private Msg  | 32           | 56         |
+|634&#124;S&#124;32         | 634    | Status Update| 32           | -          |
 
 Using the verification program supplied, you will receive exactly 10000000 events,
 with sequence number from 1 to 10000000. **The events will arrive out of order**.
