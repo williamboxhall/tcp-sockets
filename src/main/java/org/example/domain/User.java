@@ -34,6 +34,7 @@ public class User {
 		followers.remove(userId);
 	}
 
+	// TODO consider making User event-centric
 	public Set<Integer> getFollowers() {
 		return new HashSet<>(followers);
 	}
