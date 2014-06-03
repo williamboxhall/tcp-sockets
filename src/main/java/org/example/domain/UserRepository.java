@@ -4,16 +4,16 @@ import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static org.example.infrastructure.Logger.LOG;
 
-import java.nio.channels.SocketChannel;
-import java.util.HashMap;
+import java.net.Socket;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.example.infrastructure.ConnectionFactory;
 
 public class UserRepository {
-	private final Map<Integer, User> users = new HashMap<>();
+	private final Map<Integer, User> users = new ConcurrentHashMap<>(); // TODO read more about this
 	private final UserFactory userFactory;
 	private final ConnectionFactory connectionFactory;
 
@@ -22,8 +22,8 @@ public class UserRepository {
 		this.connectionFactory = connectionFactory;
 	}
 
-	public void connect(int userId, SocketChannel socketChannel) {
-		get(userId).updateConnection(connectionFactory.createFor(socketChannel, valueOf(userId)));
+	public void connect(int userId, Socket socket) {
+		get(userId).updateConnection(connectionFactory.createFor(socket, valueOf(userId)));
 		LOG.info(format("User %s connected", userId));
 	}
 
@@ -36,5 +36,9 @@ public class UserRepository {
 
 	public Set<User> allUsers() {
 		return new HashSet<>(users.values());
+	}
+
+	public void disconnectAll() {
+		// TODO implement
 	}
 }

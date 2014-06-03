@@ -5,11 +5,8 @@ import static org.example.infrastructure.Logger.LOG;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.nio.channels.ServerSocketChannel;
-import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -23,38 +20,65 @@ class Server {
 	private static final int CLIENT_PORT = 9099;
 
 	public static void main(String args[]) {
-		try {
-			LOG.info("Running. Awaiting event source connection... ");
-			Socket eventSource = new ServerSocket(EVENT_SOURCE_PORT).accept();
-			LOG.info("SUCCESS");
-
-			ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-			serverSocketChannel.socket().bind(new InetSocketAddress(CLIENT_PORT));
-			serverSocketChannel.configureBlocking(false);
-
-			UserRepository userRepository = new UserRepository(new UserFactory(), new ConnectionFactory());
-			Map<Long, Event> eventQueue = new HashMap<>();
-			Dispatcher dispatcher = new Dispatcher(userRepository);
-
-			// for each batch
-			while (true) {
-				acceptNewClients(serverSocketChannel, userRepository);
-				enqueueNextBatchOfEvents(eventSource, eventQueue);
-				dispatcher.drainQueuedEventsInOrder(eventQueue);
-			}
-			// TODO close all the sockets
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		UserRepository userRepository = new UserRepository(new UserFactory(), new ConnectionFactory());
+		startClientsThread(userRepository);
+		LOG.info("Client thread started");
+		startEventThread(userRepository);
+		LOG.info("Event thread started");
 	}
 
-	private static void acceptNewClients(ServerSocketChannel serverSocketChannel, UserRepository userRepository) throws IOException {
-		SocketChannel clientSocketChannel = serverSocketChannel.accept();
-		if (clientSocketChannel != null) {
-			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocketChannel.socket().getInputStream()));
-			int userId = Integer.parseInt(in.readLine());
-			userRepository.connect(userId, clientSocketChannel);
-		}
+	private static void startEventThread(final UserRepository userRepository) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Socket eventSource = null;
+				try {
+					LOG.info("Running. Awaiting event source connection... ");
+					eventSource = new ServerSocket(EVENT_SOURCE_PORT).accept();
+					LOG.info("SUCCESS");
+					Map<Long, Event> eventQueue = new HashMap<>();
+					Dispatcher dispatcher = new Dispatcher(userRepository);
+					while (true) {
+						enqueueNextBatchOfEvents(eventSource, eventQueue);
+						dispatcher.drainQueuedEventsInOrder(eventQueue);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				} finally {
+					try {
+						if (eventSource != null) {
+							eventSource.close();
+						}
+					} catch (IOException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}, "event thread").start();
+	}
+
+	private static void startClientsThread(final UserRepository userRepository) {
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				try {
+					ServerSocket serverSocket = new ServerSocket(CLIENT_PORT);
+					while (true) {
+						acceptNewClients(serverSocket.accept(), userRepository);
+					}
+				} catch (IOException e) {
+					e.printStackTrace();
+				} finally {
+					userRepository.disconnectAll();
+				}
+			}
+		}, "client thread").start();
+	}
+
+	private static void acceptNewClients(Socket clientSocket, UserRepository userRepository) throws IOException {
+		BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
+		int userId = Integer.parseInt(in.readLine());
+		userRepository.connect(userId, clientSocket);
 	}
 
 	private static void enqueueNextBatchOfEvents(Socket eventSource, Map<Long, Event> eventQueue) throws IOException {

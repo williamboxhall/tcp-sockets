@@ -2,21 +2,21 @@ package org.example.infrastructure;
 
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.nio.channels.SocketChannel;
+import java.net.Socket;
 
 import org.example.domain.Event;
 
 public class SocketConnection implements Connection {
-	private final SocketChannel socketChannel;
+	private final Socket socket;
 
-	public SocketConnection(SocketChannel socketChannel) {
-		this.socketChannel = socketChannel;
+	public SocketConnection(Socket socket) {
+		this.socket = socket;
 	}
 
 	@Override
 	public void send(Event event) {
 		try {
-			new PrintWriter(socketChannel.socket().getOutputStream(), true).println(event.raw());
+			new PrintWriter(socket.getOutputStream(), true).println(event.raw());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

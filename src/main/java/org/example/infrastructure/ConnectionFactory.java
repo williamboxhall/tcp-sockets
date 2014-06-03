@@ -3,7 +3,7 @@ package org.example.infrastructure;
 import static java.lang.String.format;
 import static org.example.infrastructure.Logger.LOG;
 
-import java.nio.channels.SocketChannel;
+import java.net.Socket;
 
 import org.example.domain.Event;
 
@@ -15,7 +15,7 @@ public class ConnectionFactory {
 		}
 	};
 
-	public Connection createFor(SocketChannel socketChannel, String name) {
-		return new FallbackConnection(new SocketConnection(socketChannel), BLACK_HOLE, name);
+	public Connection createFor(Socket socket, String name) {
+		return new FallbackConnection(new SocketConnection(socket), BLACK_HOLE, name);
 	}
 }

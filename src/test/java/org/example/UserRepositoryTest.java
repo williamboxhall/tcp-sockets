@@ -7,7 +7,7 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.nio.channels.SocketChannel;
+import java.net.Socket;
 
 import org.example.domain.User;
 import org.example.domain.UserFactory;
@@ -26,7 +26,7 @@ public class UserRepositoryTest {
 	private static final int ANOTHER_USER_ID = 42;
 
 	@Mock
-	private SocketChannel socketChannel;
+	private Socket socket;
 	@Mock
 	private ConnectionFactory connectionFactory;
 	@Mock
@@ -50,8 +50,8 @@ public class UserRepositoryTest {
 	@Test
 	public void shouldUpdateConnectionForUnknownUser() {
 		when(userFactory.create()).thenReturn(user);
-		when(connectionFactory.createFor(socketChannel, valueOf(UNKNOWN_USER_ID))).thenReturn(connection);
-		userRepository.connect(UNKNOWN_USER_ID, socketChannel);
+		when(connectionFactory.createFor(socket, valueOf(UNKNOWN_USER_ID))).thenReturn(connection);
+		userRepository.connect(UNKNOWN_USER_ID, socket);
 		verify(user).updateConnection(connection);
 	}
 
@@ -59,7 +59,7 @@ public class UserRepositoryTest {
 	public void shouldExposeAllUserIds() {
 		when(userFactory.create()).thenReturn(user).thenReturn(anotherUser);
 		userRepository.get(UNKNOWN_USER_ID);
-		userRepository.connect(ANOTHER_USER_ID, socketChannel);
+		userRepository.connect(ANOTHER_USER_ID, socket);
 		assertThat(userRepository.allUsers(), containsInAnyOrder(user, anotherUser));
 	}
 }

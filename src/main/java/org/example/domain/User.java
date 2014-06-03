@@ -21,6 +21,10 @@ public class User {
 		this.connection = connection;
 	}
 
+	public void disconnect() {
+		// TODO implement
+	}
+
 	public void addFollower(int userId) {
 		followers.add(userId);
 	}
