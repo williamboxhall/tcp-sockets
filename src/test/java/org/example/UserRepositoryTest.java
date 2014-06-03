@@ -3,12 +3,16 @@ package org.example;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
-import static org.hamcrest.Matchers.notNullValue;
-import static org.hamcrest.Matchers.nullValue;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import java.nio.channels.SocketChannel;
 
-import org.junit.Ignore;
+import org.example.domain.User;
+import org.example.domain.UserFactory;
+import org.example.domain.UserRepository;
+import org.example.infrastructure.Connection;
+import org.example.infrastructure.ConnectionFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -19,31 +23,38 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class UserRepositoryTest {
 	private static final int UNKNOWN_USER_ID = -1;
 	private static final int ANOTHER_USER_ID = 42;
-	@InjectMocks
-	private UserRepository userRepository;
+
 	@Mock
 	private SocketChannel socketChannel;
+	@Mock
+	private ConnectionFactory connectionFactory;
+	@Mock
+	private UserFactory userFactory;
+	@Mock
+	private User user;
+	@Mock
+	private Connection connection;
+
+	@InjectMocks
+	private UserRepository userRepository;
 
 	@Test
 	public void shouldExposeUnknownUsersAsNewUser() {
-		assertThat(userRepository.get(UNKNOWN_USER_ID), is(notNullValue()));
+		when(userFactory.create()).thenReturn(user);
+		assertThat(userRepository.get(UNKNOWN_USER_ID), is(user));
 	}
 
 	@Test
-	public void shouldExposeUnknownUsersAsSocketless() {
-		assertThat(userRepository.get(UNKNOWN_USER_ID).getConnection(), is(nullValue()));
-	}
-
-	@Test
-	@Ignore
-	public void shouldUpdateConnectionForUnknownUser() { // TODO factory or reflectomatic
+	public void shouldUpdateConnectionForUnknownUser() {
+		when(userFactory.create()).thenReturn(user);
+		when(connectionFactory.createFor(socketChannel)).thenReturn(connection);
 		userRepository.connect(UNKNOWN_USER_ID, socketChannel);
-		Connection connection = null;
-		assertThat(userRepository.get(UNKNOWN_USER_ID).getConnection(), is(connection));
+		verify(user).updateConnection(connection);
 	}
 
 	@Test
 	public void shouldExposeAllUserIds() {
+		when(userFactory.create()).thenReturn(user);
 		userRepository.get(UNKNOWN_USER_ID);
 		userRepository.connect(ANOTHER_USER_ID, socketChannel);
 		assertThat(userRepository.allUserIds(), containsInAnyOrder(UNKNOWN_USER_ID, ANOTHER_USER_ID));

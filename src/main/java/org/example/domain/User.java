@@ -1,7 +1,9 @@
-package org.example;
+package org.example.domain;
 
 import java.util.HashSet;
 import java.util.Set;
+
+import org.example.infrastructure.Connection;
 
 public class User {
 	private final Set<Integer> followers = new HashSet<>();
@@ -11,11 +13,11 @@ public class User {
 		this.connection = connection;
 	}
 
-	public Connection getConnection() {
-		return connection;
+	public void send(String event) {
+		connection.send(event);
 	}
 
-	public void setSocketChannel(Connection connection) {
+	public void updateConnection(Connection connection) {
 		this.connection = connection;
 	}
 

@@ -5,6 +5,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
+import org.example.infrastructure.Connection;
+import org.example.infrastructure.FallbackConnection;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;

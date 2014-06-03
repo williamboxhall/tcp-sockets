@@ -1,4 +1,4 @@
-package org.example;
+package org.example.infrastructure;
 
 public interface Connection {
 	public static Connection BLACK_HOLE = new Connection() {

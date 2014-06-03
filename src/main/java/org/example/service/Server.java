@@ -1,4 +1,4 @@
-package org.example;
+package org.example.service;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -11,6 +11,10 @@ import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+
+import org.example.domain.UserFactory;
+import org.example.domain.UserRepository;
+import org.example.infrastructure.ConnectionFactory;
 
 class Server {
 
@@ -27,7 +31,7 @@ class Server {
 			serverSocketChannel.socket().bind(new InetSocketAddress(CLIENT_PORT));
 			serverSocketChannel.configureBlocking(false);
 
-			UserRepository userRepository = new UserRepository();
+			UserRepository userRepository = new UserRepository(new UserFactory(), new ConnectionFactory());
 			Map<Long, String> eventQueue = new HashMap<>();
 
 			long lastDispatchedSeqNo = 0;
@@ -113,8 +117,7 @@ class Server {
 		}
 	}
 
-	private static void writeStringToSocket(Integer clientId, String event, UserRepository userRepository) throws IOException {
-		User user = userRepository.get(clientId);
-		user.getConnection().send(event);
+	private static void writeStringToSocket(int clientId, String event, UserRepository userRepository) throws IOException {
+		userRepository.get(clientId).send(event);
 	}
 }
