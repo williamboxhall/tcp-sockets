@@ -11,6 +11,7 @@ import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.example.domain.Event;
 import org.example.domain.UserFactory;
 import org.example.domain.UserRepository;
 import org.example.infrastructure.ConnectionFactory;
@@ -31,15 +32,15 @@ class Server {
 			serverSocketChannel.configureBlocking(false);
 
 			UserRepository userRepository = new UserRepository(new UserFactory(), new ConnectionFactory());
-			Map<Long, String> eventQueue = new HashMap<>();
+			Map<Long, Event> eventQueue = new HashMap<>();
 
-			long lastDispatchedSeqNo = 0;
+			Dispatcher dispatcher = new Dispatcher(userRepository);
 
 			// for each batch
 			while (true) {
 				acceptNewClients(serverSocketChannel, userRepository);
 				enqueueNextBatchOfEvents(eventSource, eventQueue);
-				lastDispatchedSeqNo = drainQueuedEventsInOrder(eventQueue, userRepository, lastDispatchedSeqNo);
+				dispatcher.drainQueuedEventsInOrder(eventQueue);
 			}
 			// TODO close all the sockets
 		} catch (Exception e) {
@@ -56,30 +57,11 @@ class Server {
 		}
 	}
 
-	private static void enqueueNextBatchOfEvents(Socket eventSource, Map<Long, String> eventQueue) throws IOException {
+	private static void enqueueNextBatchOfEvents(Socket eventSource, Map<Long, Event> eventQueue) throws IOException {
 		BufferedReader in = new BufferedReader(new InputStreamReader(eventSource.getInputStream()));
-		if (in.ready()) {
-			while (in.ready()) {
-				String event = in.readLine();
-				long seqNo = Long.parseLong(event.split("\\|")[0]);
-				eventQueue.put(seqNo, event);
-			}
+		while (in.ready()) {
+			Event event = new Event(in.readLine());
+			eventQueue.put(event.getSequenceNumber(), event);
 		}
 	}
-
-	private static long drainQueuedEventsInOrder(Map<Long, String> eventQueue, UserRepository userRepository, long lastDispatchedSeqNo) throws IOException {
-		if (!eventQueue.isEmpty()) {
-			while (!eventQueue.isEmpty()) {
-				lastDispatchedSeqNo = lastDispatchedSeqNo + 1;
-				String event = eventQueue.get(lastDispatchedSeqNo);
-				if (event == null) {
-					throw new Error("No event found for " + lastDispatchedSeqNo);
-				}
-				new Dispatcher(userRepository).dispatch(event);
-				eventQueue.remove(lastDispatchedSeqNo);
-			}
-		}
-		return lastDispatchedSeqNo;
-	}
-
 }
