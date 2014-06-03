@@ -126,7 +126,7 @@ class Server {
 
 	private static void writeStringToSocket(Integer clientId, String event, Map<Integer, User> clients) throws IOException {
 		User user = clients.get(clientId);
-		if (user != null && user.getSocketChannel() != null && user.getSocketChannel().isConnected()) { // TODO assess when is null and when is disconnected
+		if (user != null && user.getSocketChannel() != null && user.getSocketChannel().isConnected()) {
 			PrintWriter out = new PrintWriter(user.getSocketChannel().socket().getOutputStream(), true);
 			out.println(event);
 		} else {
