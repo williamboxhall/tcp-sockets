@@ -24,7 +24,7 @@ public class UserRepository {
 
 	public void connect(int userId, SocketChannel socketChannel) {
 		get(userId).updateConnection(connectionFactory.createFor(socketChannel, valueOf(userId)));
-		LOG.debug(format("User %s connected", userId));
+		LOG.info(format("User %s connected", userId));
 	}
 
 	public User get(int userId) {

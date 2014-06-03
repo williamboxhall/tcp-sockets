@@ -26,7 +26,7 @@ public class FallbackConnection implements Connection {
 				primary.send(event);
 			} catch (RuntimeException e) {
 				failOver = true;
-				LOG.debug(format("User %s disconnected", name));
+				LOG.info(format("User %s disconnected", name));
 				secondary.send(event);
 			}
 		}
