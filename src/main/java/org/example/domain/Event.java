@@ -16,23 +16,28 @@ public class Event {
 		this.toUserId = parts.length <= 3 ? null : Integer.valueOf(parts[3]);
 	}
 
-	public long getSequenceNumber() {
+	public long sequenceNumber() {
 		return sequenceNumber;
 	}
 
-	public EventType getType() {
+	public EventType type() {
 		return type;
 	}
 
-	public int getFromUserId() {
+	public int fromUserId() {
 		return fromUserId;
 	}
 
-	public int getToUserId() {
+	public int toUserId() {
 		return toUserId;
 	}
 
 	public String raw() {
+		return raw;
+	}
+
+	@Override
+	public String toString() {
 		return raw;
 	}
 }

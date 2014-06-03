@@ -1,5 +1,9 @@
 package org.example.domain;
 
+import static java.lang.String.format;
+import static java.lang.String.valueOf;
+import static org.example.infrastructure.Logger.LOG;
+
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -19,7 +23,8 @@ public class UserRepository {
 	}
 
 	public void connect(int userId, SocketChannel socketChannel) {
-		get(userId).updateConnection(connectionFactory.createFor(socketChannel));
+		get(userId).updateConnection(connectionFactory.createFor(socketChannel, valueOf(userId)));
+		LOG.debug(format("User %s connected", userId));
 	}
 
 	public User get(int userId) {

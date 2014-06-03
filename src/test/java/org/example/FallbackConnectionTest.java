@@ -17,6 +17,7 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class FallbackConnectionTest {
 	@Mock
 	private Event event;
+	@Mock
 	private Event anotherEvent;
 	@Mock
 	private Connection primary;
@@ -25,7 +26,7 @@ public class FallbackConnectionTest {
 
 	@Test
 	public void sendsMessageToPrimaryConnection() {
-		FallbackConnection fallbackConnection = new FallbackConnection(primary, secondary);
+		FallbackConnection fallbackConnection = new FallbackConnection(primary, secondary, "name");
 		fallbackConnection.send(event);
 		verify(primary).send(event);
 		verifyZeroInteractions(secondary);
@@ -33,7 +34,7 @@ public class FallbackConnectionTest {
 
 	@Test
 	public void fallsBackToSecondaryWhenPrimaryConnectionFails() {
-		FallbackConnection fallbackConnection = new FallbackConnection(primary, secondary);
+		FallbackConnection fallbackConnection = new FallbackConnection(primary, secondary, "name");
 		doThrow(new RuntimeException("expected")).when(primary).send(event);
 		fallbackConnection.send(event);
 		verify(primary).send(event);
@@ -41,7 +42,7 @@ public class FallbackConnectionTest {
 
 	@Test
 	public void continuesToUseSecondaryForSubsequentMessages() {
-		FallbackConnection fallbackConnection = new FallbackConnection(primary, secondary);
+		FallbackConnection fallbackConnection = new FallbackConnection(primary, secondary, "name");
 		doThrow(new RuntimeException("expected")).when(primary).send(event);
 		fallbackConnection.send(event);
 		fallbackConnection.send(anotherEvent);

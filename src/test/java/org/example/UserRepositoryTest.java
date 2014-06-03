@@ -1,5 +1,6 @@
 package org.example;
 
+import static java.lang.String.valueOf;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
@@ -49,7 +50,7 @@ public class UserRepositoryTest {
 	@Test
 	public void shouldUpdateConnectionForUnknownUser() {
 		when(userFactory.create()).thenReturn(user);
-		when(connectionFactory.createFor(socketChannel)).thenReturn(connection);
+		when(connectionFactory.createFor(socketChannel, valueOf(UNKNOWN_USER_ID))).thenReturn(connection);
 		userRepository.connect(UNKNOWN_USER_ID, socketChannel);
 		verify(user).updateConnection(connection);
 	}

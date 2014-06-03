@@ -1,6 +1,7 @@
 package org.example.domain;
 
-import static org.example.infrastructure.Connection.BLACK_HOLE;
+
+import static org.example.infrastructure.ConnectionFactory.BLACK_HOLE;
 
 public class UserFactory {
 	public User create() {

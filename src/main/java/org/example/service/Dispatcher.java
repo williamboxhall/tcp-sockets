@@ -7,7 +7,7 @@ import org.example.domain.Event;
 import org.example.domain.UserRepository;
 
 public class Dispatcher {
-	private UserRepository userRepository;
+	private final UserRepository userRepository;
 	private long lastDispatchedSeqNo = 0;
 
 	public Dispatcher(UserRepository userRepository) {
@@ -18,7 +18,7 @@ public class Dispatcher {
 		while (!eventQueue.isEmpty()) {
 			lastDispatchedSeqNo++;
 			Event event = eventQueue.get(lastDispatchedSeqNo);
-			event.getType().informUsers(event, userRepository);
+			event.type().informUsers(event, userRepository);
 			eventQueue.remove(lastDispatchedSeqNo);
 		}
 	}

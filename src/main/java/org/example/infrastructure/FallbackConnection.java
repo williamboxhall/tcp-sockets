@@ -1,15 +1,20 @@
 package org.example.infrastructure;
 
+import static java.lang.String.format;
+import static org.example.infrastructure.Logger.LOG;
+
 import org.example.domain.Event;
 
 public class FallbackConnection implements Connection {
 	private final Connection primary;
 	private final Connection secondary;
+	private final String name;
 	private boolean failOver = false;
 
-	public FallbackConnection(Connection primary, Connection secondary) {
+	public FallbackConnection(Connection primary, Connection secondary, String name) {
 		this.primary = primary;
 		this.secondary = secondary;
+		this.name = name;
 	}
 
 	@Override
@@ -21,7 +26,7 @@ public class FallbackConnection implements Connection {
 				primary.send(event);
 			} catch (RuntimeException e) {
 				failOver = true;
-				System.out.println("Disconnected"); // TODO replace all printlns with log
+				LOG.debug(format("User %s disconnected", name));
 				secondary.send(event);
 			}
 		}

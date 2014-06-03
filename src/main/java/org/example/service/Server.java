@@ -1,5 +1,7 @@
 package org.example.service;
 
+import static org.example.infrastructure.Logger.LOG;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -17,15 +19,14 @@ import org.example.domain.UserRepository;
 import org.example.infrastructure.ConnectionFactory;
 
 class Server {
-
 	private static final int EVENT_SOURCE_PORT = 9090;
 	private static final int CLIENT_PORT = 9099;
 
 	public static void main(String args[]) {
 		try {
-			System.out.print("Running. Awaiting event source connection... ");
+			LOG.info("Running. Awaiting event source connection... ");
 			Socket eventSource = new ServerSocket(EVENT_SOURCE_PORT).accept();
-			System.out.println("SUCCESS");
+			LOG.info("SUCCESS");
 
 			ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
 			serverSocketChannel.socket().bind(new InetSocketAddress(CLIENT_PORT));
@@ -33,7 +34,6 @@ class Server {
 
 			UserRepository userRepository = new UserRepository(new UserFactory(), new ConnectionFactory());
 			Map<Long, Event> eventQueue = new HashMap<>();
-
 			Dispatcher dispatcher = new Dispatcher(userRepository);
 
 			// for each batch
@@ -61,7 +61,7 @@ class Server {
 		BufferedReader in = new BufferedReader(new InputStreamReader(eventSource.getInputStream()));
 		while (in.ready()) {
 			Event event = new Event(in.readLine());
-			eventQueue.put(event.getSequenceNumber(), event);
+			eventQueue.put(event.sequenceNumber(), event);
 		}
 	}
 }

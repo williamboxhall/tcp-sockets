@@ -7,15 +7,15 @@ import java.util.Set;
 public enum EventType {
 	FOLLOW("F") {
 		public void informUsers(Event event, UserRepository userRepository) {
-			User user = userRepository.get(event.getToUserId());
-			user.addFollower(event.getFromUserId());
+			User user = userRepository.get(event.toUserId());
+			user.addFollower(event.fromUserId());
 			user.send(event);
 		}
 	},
 	UNFOLLOW("U") {
 		@Override
 		public void informUsers(Event event, UserRepository userRepository) {
-			userRepository.get(event.getToUserId()).removeFollower(event.getFromUserId());
+			userRepository.get(event.toUserId()).removeFollower(event.fromUserId());
 		}
 	},
 	BROADCAST("B") {
@@ -29,13 +29,13 @@ public enum EventType {
 	PRIVATE_MESSAGE("P") {
 		@Override
 		public void informUsers(Event event, UserRepository userRepository) {
-			userRepository.get(event.getToUserId()).send(event);
+			userRepository.get(event.toUserId()).send(event);
 		}
 	},
 	STATUS_UPDATE("S") {
 		@Override
 		public void informUsers(Event event, UserRepository userRepository) {
-			Set<Integer> toUserIds = userRepository.get(event.getFromUserId()).getFollowers();
+			Set<Integer> toUserIds = userRepository.get(event.fromUserId()).getFollowers();
 			for (int toUserId : toUserIds) {
 				userRepository.get(toUserId).send(event);
 			}
