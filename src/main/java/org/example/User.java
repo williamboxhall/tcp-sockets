@@ -1,27 +1,22 @@
 package org.example;
 
-import java.nio.channels.SocketChannel;
 import java.util.HashSet;
 import java.util.Set;
 
 public class User {
 	private final Set<Integer> followers = new HashSet<>();
-	private SocketChannel socketChannel = null;
+	private Connection connection;
 
-	public User(SocketChannel socketChannel) {
-		this.socketChannel = socketChannel;
+	public User(Connection connection) {
+		this.connection = connection;
 	}
 
-	public User() {
+	public Connection getConnection() {
+		return connection;
 	}
 
-	public SocketChannel getSocketChannel() {
-		return socketChannel;
-	}
-
-	// TODO gross
-	public void setSocketChannel(SocketChannel socketChannel) {
-		this.socketChannel = socketChannel;
+	public void setSocketChannel(Connection connection) {
+		this.connection = connection;
 	}
 
 	public void addFollower(int userId) {

@@ -3,7 +3,6 @@ package org.example;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.PrintWriter;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -116,11 +115,6 @@ class Server {
 
 	private static void writeStringToSocket(Integer clientId, String event, UserRepository userRepository) throws IOException {
 		User user = userRepository.get(clientId);
-		if (user != null && user.getSocketChannel() != null && user.getSocketChannel().isConnected()) {
-			PrintWriter out = new PrintWriter(user.getSocketChannel().socket().getOutputStream(), true);
-			out.println(event);
-		} else {
-			userRepository.disconnect(clientId);
-		}
+		user.getConnection().send(event);
 	}
 }

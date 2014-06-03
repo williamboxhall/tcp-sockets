@@ -5,8 +5,6 @@ import static org.hamcrest.Matchers.contains;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
-import java.nio.channels.SocketChannel;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -17,14 +15,14 @@ import org.mockito.runners.MockitoJUnitRunner;
 public class UserTest {
 	private static final int USER_ID = 123;
 	@Mock
-	private SocketChannel socketChannel;
+	private Connection connection;
 	@InjectMocks
 	private User user;
 
 	@Test
-	public void shouldExposeSocketChannel() { // TODO gross.
-		user.setSocketChannel(socketChannel);
-		assertThat(user.getSocketChannel(), is(socketChannel));
+	public void shouldExposeConnection() { // TODO gross.
+		user.setSocketChannel(connection);
+		assertThat(user.getConnection(), is(connection));
 	}
 
 	@Test
