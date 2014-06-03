@@ -6,6 +6,7 @@ import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
+import org.example.domain.Event;
 import org.example.domain.User;
 import org.example.infrastructure.Connection;
 import org.junit.Before;
@@ -17,7 +18,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 @RunWith(MockitoJUnitRunner.class)
 public class UserTest {
 	private static final int USER_ID = 123;
-	private static final String EVENT = "event";
+
+	@Mock
+	private Event event;
 	@Mock
 	private Connection connection;
 	@Mock
@@ -32,15 +35,15 @@ public class UserTest {
 
 	@Test
 	public void shouldForwardEventsToConnection() {
-		user.send(EVENT);
-		verify(connection).send(EVENT);
+		user.send(event);
+		verify(connection).send(event);
 	}
 
 	@Test
 	public void shouldUpdateConnection() {
 		user.updateConnection(anotherConnection);
-		user.send(EVENT);
-		verify(anotherConnection).send(EVENT);
+		user.send(event);
+		verify(anotherConnection).send(event);
 		verifyZeroInteractions(connection);
 	}
 

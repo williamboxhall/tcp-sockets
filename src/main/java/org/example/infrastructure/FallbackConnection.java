@@ -1,5 +1,7 @@
 package org.example.infrastructure;
 
+import org.example.domain.Event;
+
 public class FallbackConnection implements Connection {
 	private final Connection primary;
 	private final Connection secondary;
@@ -11,16 +13,16 @@ public class FallbackConnection implements Connection {
 	}
 
 	@Override
-	public void send(String message) {
+	public void send(Event event) {
 		if (failOver) {
-			secondary.send(message);
+			secondary.send(event);
 		} else {
 			try {
-				primary.send(message);
+				primary.send(event);
 			} catch (RuntimeException e) {
 				failOver = true;
 				System.out.println("Disconnected"); // TODO replace all printlns with log
-				secondary.send(message);
+				secondary.send(event);
 			}
 		}
 	}

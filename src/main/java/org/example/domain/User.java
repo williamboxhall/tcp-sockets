@@ -13,7 +13,7 @@ public class User {
 		this.connection = connection;
 	}
 
-	public void send(String event) {
+	public void send(Event event) {
 		connection.send(event);
 	}
 

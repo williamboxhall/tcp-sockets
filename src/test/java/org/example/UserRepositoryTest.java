@@ -33,6 +33,8 @@ public class UserRepositoryTest {
 	@Mock
 	private User user;
 	@Mock
+	private User anotherUser;
+	@Mock
 	private Connection connection;
 
 	@InjectMocks
@@ -54,9 +56,9 @@ public class UserRepositoryTest {
 
 	@Test
 	public void shouldExposeAllUserIds() {
-		when(userFactory.create()).thenReturn(user);
+		when(userFactory.create()).thenReturn(user).thenReturn(anotherUser);
 		userRepository.get(UNKNOWN_USER_ID);
 		userRepository.connect(ANOTHER_USER_ID, socketChannel);
-		assertThat(userRepository.allUserIds(), containsInAnyOrder(UNKNOWN_USER_ID, ANOTHER_USER_ID));
+		assertThat(userRepository.allUsers(), containsInAnyOrder(user, anotherUser));
 	}
 }

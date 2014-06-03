@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.channels.SocketChannel;
 
+import org.example.domain.Event;
+
 public class SocketConnection implements Connection {
 	private final SocketChannel socketChannel;
 
@@ -12,9 +14,9 @@ public class SocketConnection implements Connection {
 	}
 
 	@Override
-	public void send(String message) {
+	public void send(Event event) {
 		try {
-			new PrintWriter(socketChannel.socket().getOutputStream(), true).println(message);
+			new PrintWriter(socketChannel.socket().getOutputStream(), true).println(event.raw());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

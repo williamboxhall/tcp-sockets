@@ -5,6 +5,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
+import org.example.domain.Event;
 import org.example.infrastructure.Connection;
 import org.example.infrastructure.FallbackConnection;
 import org.junit.Test;
@@ -14,8 +15,9 @@ import org.mockito.runners.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class FallbackConnectionTest {
-	private static final String MESSAGE = "foo bar baz";
-	private static final String ANOTHER_MESSAGE = "quux";
+	@Mock
+	private Event event;
+	private Event anotherEvent;
 	@Mock
 	private Connection primary;
 	@Mock
@@ -24,28 +26,28 @@ public class FallbackConnectionTest {
 	@Test
 	public void sendsMessageToPrimaryConnection() {
 		FallbackConnection fallbackConnection = new FallbackConnection(primary, secondary);
-		fallbackConnection.send(MESSAGE);
-		verify(primary).send(MESSAGE);
+		fallbackConnection.send(event);
+		verify(primary).send(event);
 		verifyZeroInteractions(secondary);
 	}
 
 	@Test
 	public void fallsBackToSecondaryWhenPrimaryConnectionFails() {
 		FallbackConnection fallbackConnection = new FallbackConnection(primary, secondary);
-		doThrow(new RuntimeException("expected")).when(primary).send(MESSAGE);
-		fallbackConnection.send(MESSAGE);
-		verify(primary).send(MESSAGE);
+		doThrow(new RuntimeException("expected")).when(primary).send(event);
+		fallbackConnection.send(event);
+		verify(primary).send(event);
 	}
 
 	@Test
 	public void continuesToUseSecondaryForSubsequentMessages() {
 		FallbackConnection fallbackConnection = new FallbackConnection(primary, secondary);
-		doThrow(new RuntimeException("expected")).when(primary).send(MESSAGE);
-		fallbackConnection.send(MESSAGE);
-		fallbackConnection.send(ANOTHER_MESSAGE);
-		verify(primary).send(MESSAGE);
+		doThrow(new RuntimeException("expected")).when(primary).send(event);
+		fallbackConnection.send(event);
+		fallbackConnection.send(anotherEvent);
+		verify(primary).send(event);
 		verifyNoMoreInteractions(primary);
-		verify(secondary).send(MESSAGE);
-		verify(secondary).send(ANOTHER_MESSAGE);
+		verify(secondary).send(event);
+		verify(secondary).send(anotherEvent);
 	}
 }

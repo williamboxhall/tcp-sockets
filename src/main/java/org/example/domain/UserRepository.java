@@ -29,7 +29,7 @@ public class UserRepository {
 		return users.get(userId);
 	}
 
-	public Set<Integer> allUserIds() {
-		return new HashSet<>(users.keySet());
+	public Set<User> allUsers() {
+		return new HashSet<>(users.values());
 	}
 }
