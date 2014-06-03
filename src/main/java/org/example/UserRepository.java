@@ -19,7 +19,7 @@ public class UserRepository {
 
 	public User get(int userId) {
 		if (!users.containsKey(userId)) {
-			users.put(userId, new User(null));
+			users.put(userId, new User());
 		}
 		return users.get(userId);
 	}

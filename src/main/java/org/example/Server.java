@@ -10,7 +10,6 @@ import java.net.Socket;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -35,11 +34,10 @@ class Server {
 			long lastDispatchedSeqNo = 0;
 
 			// for each batch
-			Map<Integer, Set<Integer>> followedToFollowers = new HashMap<>();
 			while (true) {
 				acceptNewClients(serverSocketChannel, userRepository);
 				enqueueNextBatchOfEvents(eventSource, eventQueue);
-				lastDispatchedSeqNo = drainQueuedEventsInOrder(eventQueue, userRepository, lastDispatchedSeqNo, followedToFollowers);
+				lastDispatchedSeqNo = drainQueuedEventsInOrder(eventQueue, userRepository, lastDispatchedSeqNo);
 			}
 			// TODO close all the sockets
 		} catch (Exception e) {
@@ -67,7 +65,7 @@ class Server {
 		}
 	}
 
-	private static long drainQueuedEventsInOrder(Map<Long, String> eventQueue, UserRepository userRepository, long lastDispatchedSeqNo, Map<Integer, Set<Integer>> followedToFollowers) throws IOException {
+	private static long drainQueuedEventsInOrder(Map<Long, String> eventQueue, UserRepository userRepository, long lastDispatchedSeqNo) throws IOException {
 		if (!eventQueue.isEmpty()) {
 			while (!eventQueue.isEmpty()) {
 				lastDispatchedSeqNo = lastDispatchedSeqNo + 1;
@@ -75,14 +73,14 @@ class Server {
 				if (event == null) {
 					throw new Error("No event found for " + lastDispatchedSeqNo);
 				}
-				dispatch(event, userRepository, followedToFollowers);
+				dispatch(event, userRepository);
 				eventQueue.remove(lastDispatchedSeqNo);
 			}
 		}
 		return lastDispatchedSeqNo;
 	}
 
-	private static void dispatch(String event, UserRepository userRepository, Map<Integer, Set<Integer>> followedToFollowers) throws IOException {
+	private static void dispatch(String event, UserRepository userRepository) throws IOException {
 		String[] parts = event.split("\\|");
 		String type = parts[1];
 		Integer fromUserId = parts.length <= 2 ? null : Integer.valueOf(parts[2]);
@@ -90,13 +88,7 @@ class Server {
 
 		switch (type) {
 			case "F":
-				if (!followedToFollowers.containsKey(toUserId)) {
-					Set<Integer> followers = new HashSet<>();
-					followers.add(fromUserId);
-					followedToFollowers.put(toUserId, followers);
-				} else {
-					followedToFollowers.get(toUserId).add(fromUserId);
-				}
+				userRepository.get(toUserId).addFollower(fromUserId);
 				writeStringToSocket(toUserId, event, userRepository);
 				break;
 			case "P":
@@ -104,7 +96,7 @@ class Server {
 				writeStringToSocket(toUserId, event, userRepository);
 				break;
 			case "U":
-				followedToFollowers.get(toUserId).remove(fromUserId);
+				userRepository.get(toUserId).removeFollower(fromUserId);
 				break; // TODO follow up desired behavior when a message is sent to someone without following
 			case "B":
 				for (Integer clientId : userRepository.allUserIds()) {
@@ -112,11 +104,9 @@ class Server {
 				}
 				break;
 			case "S":
-				Set<Integer> toUserIds = followedToFollowers.get(fromUserId);
-				if (toUserIds != null) {
-					for (int recipient : toUserIds) {
-						writeStringToSocket(recipient, event, userRepository);
-					}
+				Set<Integer> toUserIds = userRepository.get(fromUserId).getFollowers();
+				for (int recipient : toUserIds) {
+					writeStringToSocket(recipient, event, userRepository);
 				}
 				break;
 			default:
