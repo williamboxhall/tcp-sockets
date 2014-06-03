@@ -29,7 +29,7 @@ class Server {
 			serverSocketChannel.socket().bind(new InetSocketAddress(CLIENT_PORT));
 			serverSocketChannel.configureBlocking(false);
 
-			Map<Integer, User> clients = new HashMap<>();
+			UserRepository userRepository = new UserRepository();
 			Map<Long, String> eventQueue = new HashMap<>();
 
 			long lastDispatchedSeqNo = 0;
@@ -37,9 +37,9 @@ class Server {
 			// for each batch
 			Map<Integer, Set<Integer>> followedToFollowers = new HashMap<>();
 			while (true) {
-				acceptNewClients(serverSocketChannel, clients);
+				acceptNewClients(serverSocketChannel, userRepository);
 				enqueueNextBatchOfEvents(eventSource, eventQueue);
-				lastDispatchedSeqNo = drainQueuedEventsInOrder(eventQueue, clients, lastDispatchedSeqNo, followedToFollowers);
+				lastDispatchedSeqNo = drainQueuedEventsInOrder(eventQueue, userRepository, lastDispatchedSeqNo, followedToFollowers);
 			}
 			// TODO close all the sockets
 		} catch (Exception e) {
@@ -47,12 +47,12 @@ class Server {
 		}
 	}
 
-	private static void acceptNewClients(ServerSocketChannel serverSocketChannel, Map<Integer, User> clients) throws IOException {
+	private static void acceptNewClients(ServerSocketChannel serverSocketChannel, UserRepository userRepository) throws IOException {
 		SocketChannel clientSocketChannel = serverSocketChannel.accept();
 		if (clientSocketChannel != null) {
 			BufferedReader in = new BufferedReader(new InputStreamReader(clientSocketChannel.socket().getInputStream()));
 			int userId = Integer.parseInt(in.readLine());
-			clients.put(userId, new User(clientSocketChannel));
+			userRepository.connect(userId, clientSocketChannel);
 		}
 	}
 
@@ -67,7 +67,7 @@ class Server {
 		}
 	}
 
-	private static long drainQueuedEventsInOrder(Map<Long, String> eventQueue, Map<Integer, User> clients, long lastDispatchedSeqNo, Map<Integer, Set<Integer>> followedToFollowers) throws IOException {
+	private static long drainQueuedEventsInOrder(Map<Long, String> eventQueue, UserRepository userRepository, long lastDispatchedSeqNo, Map<Integer, Set<Integer>> followedToFollowers) throws IOException {
 		if (!eventQueue.isEmpty()) {
 			while (!eventQueue.isEmpty()) {
 				lastDispatchedSeqNo = lastDispatchedSeqNo + 1;
@@ -75,14 +75,14 @@ class Server {
 				if (event == null) {
 					throw new Error("No event found for " + lastDispatchedSeqNo);
 				}
-				dispatch(event, clients, followedToFollowers);
+				dispatch(event, userRepository, followedToFollowers);
 				eventQueue.remove(lastDispatchedSeqNo);
 			}
 		}
 		return lastDispatchedSeqNo;
 	}
 
-	private static void dispatch(String event, Map<Integer, User> clients, Map<Integer, Set<Integer>> followedToFollowers) throws IOException {
+	private static void dispatch(String event, UserRepository userRepository, Map<Integer, Set<Integer>> followedToFollowers) throws IOException {
 		String[] parts = event.split("\\|");
 		String type = parts[1];
 		Integer fromUserId = parts.length <= 2 ? null : Integer.valueOf(parts[2]);
@@ -97,25 +97,25 @@ class Server {
 				} else {
 					followedToFollowers.get(toUserId).add(fromUserId);
 				}
-				writeStringToSocket(toUserId, event, clients);
+				writeStringToSocket(toUserId, event, userRepository);
 				break;
 			case "P":
 				// TODO what is there is no following here for private messages?
-				writeStringToSocket(toUserId, event, clients);
+				writeStringToSocket(toUserId, event, userRepository);
 				break;
 			case "U":
 				followedToFollowers.get(toUserId).remove(fromUserId);
 				break; // TODO follow up desired behavior when a message is sent to someone without following
 			case "B":
-				for (Integer clientId : clients.keySet()) {
-					writeStringToSocket(clientId, event, clients);
+				for (Integer clientId : userRepository.allUserIds()) {
+					writeStringToSocket(clientId, event, userRepository);
 				}
 				break;
 			case "S":
 				Set<Integer> toUserIds = followedToFollowers.get(fromUserId);
 				if (toUserIds != null) {
 					for (int recipient : toUserIds) {
-						writeStringToSocket(recipient, event, clients);
+						writeStringToSocket(recipient, event, userRepository);
 					}
 				}
 				break;
@@ -124,13 +124,13 @@ class Server {
 		}
 	}
 
-	private static void writeStringToSocket(Integer clientId, String event, Map<Integer, User> clients) throws IOException {
-		User user = clients.get(clientId);
+	private static void writeStringToSocket(Integer clientId, String event, UserRepository userRepository) throws IOException {
+		User user = userRepository.get(clientId);
 		if (user != null && user.getSocketChannel() != null && user.getSocketChannel().isConnected()) {
 			PrintWriter out = new PrintWriter(user.getSocketChannel().socket().getOutputStream(), true);
 			out.println(event);
 		} else {
-			clients.remove(clientId);
+			userRepository.disconnect(clientId);
 		}
 	}
 }
