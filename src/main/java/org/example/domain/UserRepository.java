@@ -39,6 +39,8 @@ public class UserRepository {
 	}
 
 	public void disconnectAll() {
-		// TODO implement
+		for (User user : allUsers()) {
+			user.disconnect();
+		}
 	}
 }

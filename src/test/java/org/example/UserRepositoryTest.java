@@ -62,4 +62,14 @@ public class UserRepositoryTest {
 		userRepository.connect(ANOTHER_USER_ID, socket);
 		assertThat(userRepository.allUsers(), containsInAnyOrder(user, anotherUser));
 	}
+
+	@Test
+	public void shouldDisconnectAllUsers() {
+		when(userFactory.create()).thenReturn(user).thenReturn(anotherUser);
+		userRepository.get(UNKNOWN_USER_ID);
+		userRepository.get(ANOTHER_USER_ID);
+		userRepository.disconnectAll();
+		verify(user).disconnect();
+		verify(anotherUser).disconnect();
+	}
 }
