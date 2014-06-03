@@ -31,4 +31,10 @@ public class FallbackConnection implements Connection {
 			}
 		}
 	}
+
+	@Override
+	public void close() {
+		primary.close();
+		secondary.close();
+	}
 }

@@ -8,6 +8,7 @@ import static org.mockito.Mockito.verifyZeroInteractions;
 import org.example.domain.Event;
 import org.example.infrastructure.Connection;
 import org.example.infrastructure.FallbackConnection;
+import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -24,9 +25,15 @@ public class FallbackConnectionTest {
 	@Mock
 	private Connection secondary;
 
+	private FallbackConnection fallbackConnection;
+
+	@Before
+	public void setUp() {
+		fallbackConnection = new FallbackConnection(primary, secondary, "name");
+	}
+
 	@Test
 	public void sendsMessageToPrimaryConnection() {
-		FallbackConnection fallbackConnection = new FallbackConnection(primary, secondary, "name");
 		fallbackConnection.send(event);
 		verify(primary).send(event);
 		verifyZeroInteractions(secondary);
@@ -34,7 +41,6 @@ public class FallbackConnectionTest {
 
 	@Test
 	public void fallsBackToSecondaryWhenPrimaryConnectionFails() {
-		FallbackConnection fallbackConnection = new FallbackConnection(primary, secondary, "name");
 		doThrow(new RuntimeException("expected")).when(primary).send(event);
 		fallbackConnection.send(event);
 		verify(primary).send(event);
@@ -42,7 +48,6 @@ public class FallbackConnectionTest {
 
 	@Test
 	public void continuesToUseSecondaryForSubsequentMessages() {
-		FallbackConnection fallbackConnection = new FallbackConnection(primary, secondary, "name");
 		doThrow(new RuntimeException("expected")).when(primary).send(event);
 		fallbackConnection.send(event);
 		fallbackConnection.send(anotherEvent);
@@ -50,5 +55,12 @@ public class FallbackConnectionTest {
 		verifyNoMoreInteractions(primary);
 		verify(secondary).send(event);
 		verify(secondary).send(anotherEvent);
+	}
+
+	@Test
+	public void closesBothConnections() {
+		fallbackConnection.close();
+		verify(primary).close();
+		verify(secondary).close();
 	}
 }

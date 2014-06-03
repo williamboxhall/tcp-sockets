@@ -13,6 +13,10 @@ public class ConnectionFactory {
 		public void send(Event event) {
 			LOG.debug(format("Dropped event %s", event));
 		}
+
+		@Override
+		public void close() {
+		}
 	};
 
 	public Connection createFor(Socket socket, String name) {

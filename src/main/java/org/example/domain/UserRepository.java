@@ -22,7 +22,7 @@ public class UserRepository {
 		this.connectionFactory = connectionFactory;
 	}
 
-	public void connect(int userId, Socket socket) {
+	public void connect(int userId, Socket socket) { // TODO take connection here instead?
 		get(userId).updateConnection(connectionFactory.createFor(socket, valueOf(userId)));
 		LOG.info(format("User %s connected", userId));
 	}

@@ -42,6 +42,7 @@ public class UserTest {
 	@Test
 	public void shouldUpdateConnection() {
 		user.updateConnection(anotherConnection);
+		verify(connection).close();
 		user.send(event);
 		verify(anotherConnection).send(event);
 		verifyZeroInteractions(connection);

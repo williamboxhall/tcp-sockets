@@ -18,11 +18,12 @@ public class User {
 	}
 
 	public void updateConnection(Connection connection) {
+		disconnect();
 		this.connection = connection;
 	}
 
 	public void disconnect() {
-		// TODO implement
+		connection.close();
 	}
 
 	public void addFollower(int userId) {
