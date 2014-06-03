@@ -15,14 +15,18 @@ import java.util.Map;
 import java.util.Set;
 
 class Server {
+
+	private static final int EVENT_SOURCE_PORT = 9090;
+	private static final int CLIENT_PORT = 9099;
+
 	public static void main(String args[]) {
 		try {
 			System.out.print("Running. Awaiting event source connection... ");
-			Socket eventSource = new ServerSocket(9090).accept();
+			Socket eventSource = new ServerSocket(EVENT_SOURCE_PORT).accept();
 			System.out.println("SUCCESS");
 
 			ServerSocketChannel serverSocketChannel = ServerSocketChannel.open();
-			serverSocketChannel.socket().bind(new InetSocketAddress(9099));
+			serverSocketChannel.socket().bind(new InetSocketAddress(CLIENT_PORT));
 			serverSocketChannel.configureBlocking(false);
 
 			Map<Integer, User> clients = new HashMap<>();
