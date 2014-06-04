@@ -77,6 +77,14 @@ public class Server {
 		}, "events").start();
 	}
 
+	private static void enqueueNextBatchOfEvents(Socket eventSource, Map<Long, Event> eventQueue) throws IOException {
+		BufferedReader in = new BufferedReader(new InputStreamReader(eventSource.getInputStream()));
+		while (in.ready()) {
+			Event event = new Event(in.readLine());
+			eventQueue.put(event.sequenceNumber(), event);
+		}
+	}
+
 	private void startClientsThread() {
 		new Thread(new Runnable() {
 			@Override
@@ -99,13 +107,5 @@ public class Server {
 		BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		int userId = Integer.parseInt(in.readLine());
 		userRepository.connect(userId, clientSocket);
-	}
-
-	private static void enqueueNextBatchOfEvents(Socket eventSource, Map<Long, Event> eventQueue) throws IOException {
-		BufferedReader in = new BufferedReader(new InputStreamReader(eventSource.getInputStream()));
-		while (in.ready()) {
-			Event event = new Event(in.readLine());
-			eventQueue.put(event.sequenceNumber(), event);
-		}
 	}
 }

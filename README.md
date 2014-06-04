@@ -70,6 +70,8 @@ events **in the correct order**, regardless of the order in which the
 
 1. When server is restarted it does not need to pick up where it left off (offset by last sequence number)
 
+2. Does not support eventSource disconnection and reconnecting
+
 
 
 ### The Configuration

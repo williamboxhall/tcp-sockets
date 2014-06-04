@@ -9,7 +9,6 @@ public class App {
 	static final int EVENT_SOURCE_PORT = 9090;
 	static final int CLIENT_PORT = 9099;
 
-	// TODO provide commandline args
 	public static void main(String... args) {
 		int eventSourcePort = args.length > 0 ? parseInt(args[0]) : EVENT_SOURCE_PORT;
 		int clientPort = args.length > 1 ? parseInt(args[1]) : CLIENT_PORT;
