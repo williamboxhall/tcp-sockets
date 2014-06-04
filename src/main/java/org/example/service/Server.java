@@ -15,30 +15,47 @@ import org.example.domain.UserFactory;
 import org.example.domain.UserRepository;
 import org.example.infrastructure.ConnectionFactory;
 
-class Server {
-	private static final int EVENT_SOURCE_PORT = 9090;
-	private static final int CLIENT_PORT = 9099;
+public class Server {
+	private final int eventSourcePort;
+	private final int clientPort;
+	private final UserRepository userRepository;
+	private volatile boolean moribund = false;
 
-	public static void main(String args[]) {
-		UserRepository userRepository = new UserRepository(new UserFactory(), new ConnectionFactory());
-		startClientsThread(userRepository);
-		LOG.info("Client thread started");
-		startEventThread(userRepository);
-		LOG.info("Event thread started");
+	public Server(int eventSourcePort, int clientPort) {
+		this.eventSourcePort = eventSourcePort;
+		this.clientPort = clientPort;
+		this.userRepository = new UserRepository(new UserFactory(), new ConnectionFactory());
 	}
 
-	private static void startEventThread(final UserRepository userRepository) {
+	public void start() {
+		startClientsThread();
+		LOG.info("Client thread started");
+		startEventThread();
+		LOG.info("Event thread started");
+		shutDownHook();
+	}
+
+	private void shutDownHook() {
+		Runtime.getRuntime().addShutdownHook(new Thread() {
+			public void run() {
+				LOG.info("Shutting down. Closing all sockets.");
+				moribund = true;
+			}
+		});
+	}
+
+	private void startEventThread() {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				Socket eventSource = null;
 				try {
 					LOG.info("Running. Awaiting event source connection... ");
-					eventSource = new ServerSocket(EVENT_SOURCE_PORT).accept();
+					eventSource = new ServerSocket(eventSourcePort).accept();
 					LOG.info("SUCCESS");
 					Map<Long, Event> eventQueue = new HashMap<>();
 					Dispatcher dispatcher = new Dispatcher(userRepository);
-					while (true) {
+					while (!moribund) {
 						enqueueNextBatchOfEvents(eventSource, eventQueue);
 						dispatcher.drainQueuedEventsInOrder(eventQueue);
 					}
@@ -54,16 +71,16 @@ class Server {
 					}
 				}
 			}
-		}, "event thread").start();
+		}, "events").start();
 	}
 
-	private static void startClientsThread(final UserRepository userRepository) {
+	private void startClientsThread() {
 		new Thread(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					ServerSocket serverSocket = new ServerSocket(CLIENT_PORT);
-					while (true) {
+					ServerSocket serverSocket = new ServerSocket(clientPort);
+					while (!moribund) {
 						acceptNewClients(serverSocket.accept(), userRepository);
 					}
 				} catch (IOException e) {
@@ -72,7 +89,7 @@ class Server {
 					userRepository.disconnectAll();
 				}
 			}
-		}, "client thread").start();
+		}, "clients").start();
 	}
 
 	private static void acceptNewClients(Socket clientSocket, UserRepository userRepository) throws IOException {

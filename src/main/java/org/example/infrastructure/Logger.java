@@ -4,7 +4,7 @@ import static java.lang.String.format;
 
 public class Logger {
 	public static final Logger LOG = new Logger();
-	private boolean enabled = false;
+	public static boolean DEBUG = false;
 
 	public void error(String message) {
 		println(message, "ERROR");
@@ -15,7 +15,7 @@ public class Logger {
 	}
 
 	public void debug(String message) {
-		if (enabled) {
+		if (DEBUG) {
 			println(message, "DEBUG");
 		}
 	}
