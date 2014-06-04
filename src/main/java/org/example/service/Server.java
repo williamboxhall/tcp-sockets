@@ -62,7 +62,11 @@ public class Server {
 					InputStream inputStream = eventSource.getInputStream();
 					BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
 					while (!stopRequested) {
-						enqueueNextBatchOfEvents(in, eventQueue);
+						String raw = in.readLine();
+						if (raw != null) {
+							Event event = new Event(raw);
+							eventQueue.put(event.sequenceNumber(), event);
+						}
 						dispatcher.drainQueuedEventsInOrder(eventQueue);
 					}
 				} catch (IOException e) {
@@ -78,13 +82,6 @@ public class Server {
 				}
 			}
 		}.start();
-	}
-
-	private static void enqueueNextBatchOfEvents(BufferedReader in, Map<Long, Event> eventQueue) throws IOException {
-		if (in.ready()) {
-			Event event = new Event(in.readLine());
-			eventQueue.put(event.sequenceNumber(), event);
-		}
 	}
 
 	private void startClientsThread() {
