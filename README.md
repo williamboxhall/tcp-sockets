@@ -70,7 +70,9 @@ events **in the correct order**, regardless of the order in which the
 2. When server is restarted it does not need to pick up where it left off (offset by last sequence number)
 
 
-### Building & Running
+### Running
+
+#### Production
 
 `mvn clean compile exec:java -Dexec.mainClass="org.example.presentation.App"`
 
@@ -80,6 +82,11 @@ or from project root
 mvn clean package
 java -jar target/follower-maze-0.0.1-SNAPSHOT.jar
 `
+
+#### Unit & End-to-end Tests
+
+'mvn clean test'
+
 ### The Configuration
 
 During development, it is possible to modify the test program behavior using the 
