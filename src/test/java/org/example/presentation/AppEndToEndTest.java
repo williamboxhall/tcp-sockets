@@ -18,21 +18,26 @@ public class AppEndToEndTest {
 	private static final int EVENT_SOURCE_PORT = 1234;
 	private static final int CLIENT_PORT = 5678;
 	private static Socket eventSource;
-	private static Socket client;
+	private static Socket firstClient;
+	private static Socket secondClient;
 
 	@BeforeClass
 	public static void startServer() throws IOException {
 		App.main(valueOf(EVENT_SOURCE_PORT), valueOf(CLIENT_PORT), valueOf(true));
 		eventSource = new Socket("localhost", EVENT_SOURCE_PORT);
-		client = new Socket("localhost", CLIENT_PORT);
-		write(client, "1");
+		firstClient = new Socket("localhost", CLIENT_PORT);
+		write(firstClient, "1");
 		waitForClientToFinishConnection(1);
+		secondClient = new Socket("localhost", CLIENT_PORT);
+		write(secondClient, "2");
+		waitForClientToFinishConnection(2);
 	}
 
 	@AfterClass
 	public static void stopServer() throws IOException {
 		eventSource.close();
-		client.close();
+		firstClient.close();
+		secondClient.close();
 		// App sockets closed by shutdown hook
 	}
 
@@ -44,8 +49,9 @@ public class AppEndToEndTest {
 		write(eventSource, "4|F|1|2");
 		write(eventSource, "1|F|2|1");
 
-		assertThat(readLine(client), is("1|F|2|1"));
-		assertThat(readLine(client), is("5|F|3|1"));
+		assertThat(readLine(firstClient), is("1|F|2|1"));
+		assertThat(readLine(firstClient), is("5|F|3|1"));
+		assertThat(readLine(secondClient), is("4|F|1|2"));
 	}
 
 	private static String readLine(Socket socket) throws IOException {
