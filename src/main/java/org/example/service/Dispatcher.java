@@ -8,18 +8,23 @@ import org.example.domain.UserRepository;
 
 public class Dispatcher {
 	private final UserRepository userRepository;
-	private long nextToDispatch = 1;
+	private long nextToDispatch;
 
-	public Dispatcher(UserRepository userRepository) {
+	public Dispatcher(UserRepository userRepository, long eventSeqNoOffset) {
 		this.userRepository = userRepository;
+		this.nextToDispatch = eventSeqNoOffset + 1;
 	}
 
 	void drainQueuedEventsInOrder(Map<Long, Event> eventQueue) throws IOException {
-		while (eventQueue.get(nextToDispatch) != null) {
+		while (nextEventIsReady(eventQueue)) {
 			Event event = eventQueue.get(nextToDispatch);
 			event.type().informUsers(event, userRepository);
 			eventQueue.remove(nextToDispatch);
 			nextToDispatch++;
 		}
+	}
+
+	private boolean nextEventIsReady(Map<Long, Event> eventQueue) {
+		return eventQueue.containsKey(nextToDispatch);
 	}
 }

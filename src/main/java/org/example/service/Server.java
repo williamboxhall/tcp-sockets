@@ -14,17 +14,21 @@ import org.example.domain.Event;
 import org.example.domain.UserFactory;
 import org.example.domain.UserRepository;
 import org.example.infrastructure.ConnectionFactory;
+import org.example.infrastructure.Logger;
 
 public class Server {
 	private final int eventSourcePort;
 	private final int clientPort;
+	private final long eventSeqNoOffset;
 	private final UserRepository userRepository;
 	private volatile boolean moribund = false;
 
-	public Server(int eventSourcePort, int clientPort) {
+	public Server(int eventSourcePort, int clientPort, boolean debug, long eventSeqNoOffset) {
 		this.eventSourcePort = eventSourcePort;
 		this.clientPort = clientPort;
+		this.eventSeqNoOffset = eventSeqNoOffset;
 		this.userRepository = new UserRepository(new UserFactory(), new ConnectionFactory());
+		Logger.DEBUG = debug;
 	}
 
 	public void start() {
@@ -55,7 +59,7 @@ public class Server {
 					eventSource = new ServerSocket(eventSourcePort).accept();
 					LOG.info("SUCCESS");
 					Map<Long, Event> eventQueue = new HashMap<>();
-					Dispatcher dispatcher = new Dispatcher(userRepository);
+					Dispatcher dispatcher = new Dispatcher(userRepository, eventSeqNoOffset);
 					while (!moribund) {
 						enqueueNextBatchOfEvents(eventSource, eventQueue);
 						dispatcher.drainQueuedEventsInOrder(eventQueue);
