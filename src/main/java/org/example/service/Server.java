@@ -35,32 +35,35 @@ public class Server {
 		LOG.info("Client thread started");
 		startEventThread();
 		LOG.info("Event thread started");
-		shutDownHook();
 		LOG.info("Ctrl-C to shut down");
-	}
-
-	private void shutDownHook() {
-		Runtime.getRuntime().addShutdownHook(new Thread() {
-			public void run() {
-				LOG.info("Shutting down. Closing all sockets.");
-				stopRequested = true;
-			}
-		});
 	}
 
 	private void startEventThread() {
 		new Thread("events") {
 			@Override
 			public void run() {
-				Socket eventSource = null;
 				try {
 					LOG.info("Running. Awaiting event source connection... ");
-					eventSource = new ServerSocket(eventSourcePort).accept();
+					final Socket eventSource = new ServerSocket(eventSourcePort).accept();
 					LOG.info("SUCCESS");
 					Map<Long, Event> eventQueue = new HashMap<>();
 					Dispatcher dispatcher = new Dispatcher(userRepository);
 					InputStream inputStream = eventSource.getInputStream();
 					BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
+
+					ensure(new Runnable() {
+						@Override
+						public void run() {
+							try {
+								eventSource.close();
+								LOG.info("Event source socket closed");
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+						}
+					});
+
+
 					while (!stopRequested) {
 						String raw = in.readLine();
 						if (raw != null) {
@@ -71,14 +74,6 @@ public class Server {
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
-				} finally {
-					try {
-						if (eventSource != null) {
-							eventSource.close();
-						}
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
 				}
 			}
 		}.start();
@@ -90,13 +85,19 @@ public class Server {
 			public void run() {
 				try {
 					ServerSocket serverSocket = new ServerSocket(clientPort);
+
+					ensure(new Runnable() {
+						public void run() {
+							userRepository.disconnectAll();
+							LOG.info("All client sockets closed");
+						}
+					});
+
 					while (!stopRequested) {
 						acceptNewClients(serverSocket.accept(), userRepository);
 					}
 				} catch (IOException e) {
 					e.printStackTrace();
-				} finally {
-					userRepository.disconnectAll();
 				}
 			}
 		}, "clients").start();
@@ -106,5 +107,9 @@ public class Server {
 		BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 		int userId = Integer.parseInt(in.readLine());
 		userRepository.connect(userId, clientSocket);
+	}
+
+	private void ensure(Runnable runnable) {
+		Runtime.getRuntime().addShutdownHook(new Thread(runnable));
 	}
 }
