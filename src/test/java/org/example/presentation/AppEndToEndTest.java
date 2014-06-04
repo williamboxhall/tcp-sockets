@@ -60,22 +60,12 @@ public class AppEndToEndTest {
 
 		BufferedReader firstClientIn = new BufferedReader(new InputStreamReader(client.getInputStream()));
 
-		Event first = new Event(largeSequenceNumber + "|B");
-		Event second = new Event((largeSequenceNumber + 1) + "|B");
-		Event third = new Event((largeSequenceNumber + 2) + "|B");
-		Event fourth = new Event((largeSequenceNumber + 3) + "|B");
-		eventSource.send(first);
-		eventSource.send(second);
-		eventSource.send(second);
-		eventSource.send(third);
-		eventSource.send(fourth);
-
-		waitUntilReady(firstClientIn);
-		assertThat(firstClientIn.readLine(), is(first.raw()));
-		assertThat(firstClientIn.readLine(), is(second.raw()));
-		assertThat(firstClientIn.readLine(), is(third.raw()));
-		assertThat(firstClientIn.readLine(), is(fourth.raw()));
-
+		for (long i = largeSequenceNumber; i < largeSequenceNumber + 4; i++) {
+			Event event = new Event(i + "|B");
+			eventSource.send(event);
+			waitUntilReady(firstClientIn);
+			assertThat(firstClientIn.readLine(), is(event.raw()));
+		}
 
 		eventSource.close();
 		client.close();
