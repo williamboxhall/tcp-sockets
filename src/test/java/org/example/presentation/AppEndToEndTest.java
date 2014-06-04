@@ -13,62 +13,56 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import org.example.domain.Event;
-import org.example.infrastructure.SocketConnection;
+import org.junit.After;
+import org.junit.AfterClass;
+import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
 public class AppEndToEndTest {
-	@Test
-	public void clientReceivesRelevantEvent() throws IOException, InterruptedException {
-		App.main(valueOf(EVENT_SOURCE_PORT), valueOf(CLIENT_PORT), valueOf(false), valueOf(0));
+	private Socket eventSource;
+	private Socket client;
 
-		Socket client = new Socket("localhost", CLIENT_PORT);
-		SocketConnection eventSource = new SocketConnection(new Socket("localhost", EVENT_SOURCE_PORT));
+	@BeforeClass
+	public static void startServer() throws IOException {
+		App.main(valueOf(EVENT_SOURCE_PORT), valueOf(CLIENT_PORT), valueOf(false));
+	}
 
-		new PrintWriter(client.getOutputStream(), true).println("1");
+	@AfterClass
+	public static void stopServer() {
+		// handled by shutdown hook in Server.java
+	}
 
-		eventSource.send(new Event("1|F|2|1"));
-		eventSource.send(new Event("2|F|3|4"));
-		eventSource.send(new Event("3|F|1|2"));
-		eventSource.send(new Event("4|F|3|1"));
+	@Before
+	public void openSockets() throws IOException {
+		client = new Socket("localhost", CLIENT_PORT);
+		eventSource = new Socket("localhost", EVENT_SOURCE_PORT);
+	}
 
-		BufferedReader firstClientIn = new BufferedReader(new InputStreamReader(client.getInputStream()));
-		waitUntilReady(firstClientIn);
-		assertThat(firstClientIn.readLine(), is("1|F|2|1"));
-		assertThat(firstClientIn.readLine(), is("4|F|3|1"));
-
+	@After
+	public void closeSockets() throws IOException {
 		eventSource.close();
 		client.close();
+	}
+
+	@Test
+	public void clientReceivesRelevantEvents() throws IOException, InterruptedException {
+		write(client, "1");
+
+		write(eventSource, "1|F|2|1");
+		write(eventSource, "2|F|3|4");
+		write(eventSource, "3|F|1|2");
+		write(eventSource, "4|F|3|1");
+
+		assertThat(readLine(client), is("1|F|2|1"));
+		assertThat(readLine(client), is("4|F|3|1"));
 	}
 
 	@Test
 	@Ignore
 	public void clientAndEventSourceComingGoingAndReturning() {
 		fail("Not yet implemented");
-	}
-
-	@Test
-	public void eventSequenceNumberGreaterThanMaxInteger() throws IOException {
-		long largeSequenceNumber = Integer.MAX_VALUE - 1;
-		App.main(valueOf(EVENT_SOURCE_PORT), valueOf(CLIENT_PORT), valueOf(false), valueOf(largeSequenceNumber - 1));
-
-		Socket client = new Socket("localhost", CLIENT_PORT);
-		SocketConnection eventSource = new SocketConnection(new Socket("localhost", EVENT_SOURCE_PORT));
-
-		new PrintWriter(client.getOutputStream(), true).println("1");
-
-		BufferedReader firstClientIn = new BufferedReader(new InputStreamReader(client.getInputStream()));
-
-		for (long i = largeSequenceNumber; i < largeSequenceNumber + 4; i++) {
-			Event event = new Event(i + "|B");
-			eventSource.send(event);
-			waitUntilReady(firstClientIn);
-			assertThat(firstClientIn.readLine(), is(event.raw()));
-		}
-
-		eventSource.close();
-		client.close();
 	}
 
 	@Test
@@ -83,8 +77,14 @@ public class AppEndToEndTest {
 		fail("Not yet implemented");
 	}
 
-	private void waitUntilReady(BufferedReader reader) throws IOException {
+	private void write(Socket socket, String message) throws IOException {
+		new PrintWriter(socket.getOutputStream(), true).println(message);
+	}
+
+	private String readLine(Socket socket) throws IOException {
+		BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		while (!reader.ready()) {
 		}
+		return reader.readLine();
 	}
 }

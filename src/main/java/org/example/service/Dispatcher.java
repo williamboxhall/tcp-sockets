@@ -8,11 +8,10 @@ import org.example.domain.UserRepository;
 
 public class Dispatcher {
 	private final UserRepository userRepository;
-	private long nextToDispatch;
+	private long nextToDispatch = 1;
 
-	public Dispatcher(UserRepository userRepository, long eventSeqNoOffset) {
+	public Dispatcher(UserRepository userRepository) {
 		this.userRepository = userRepository;
-		this.nextToDispatch = eventSeqNoOffset + 1;
 	}
 
 	void drainQueuedEventsInOrder(Map<Long, Event> eventQueue) throws IOException {
