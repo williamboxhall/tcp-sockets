@@ -66,11 +66,11 @@ events **in the correct order**, regardless of the order in which the
 
 ### Solution
 
-## Assumptions
+#### Assumptions
 
 1. When server is restarted it does not need to pick up where it left off (offset by last sequence number)
 
-2. Does not support eventSource disconnection and reconnecting
+2. Supports clients disconnecting/reconnecting but assumes one-off event source connection
 
 
 
