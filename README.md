@@ -1,19 +1,7 @@
-# Back-end Developer Challenge: Follower Maze
-Thanks for trying our development challenge!
+# Follower Maze
 
-With this document you should have received two other files:
-
-- `followermaze.sh`, an executable bash script
-- `FollowerMaze-assembly-2.0.jar`, a JAR file to be executed on a JDK 7 JVM
-
-If you haven't received any of these, or if you think there are any
-problems with the files, please contact us immediately and
-we will re-send you the missing pieces.
-
-## The Challenge
-The challenge proposed here is to build a system which acts as a socket
-server, reading events from an *event source* and forwarding them when
-appropriate to *user clients*.
+A system which acts as a socket server, reading events from an *event source*
+and forwarding them when appropriate to *user clients*.
 
 Clients will connect through TCP and use the simple protocol described in a
 section below. There will be two types of clients connecting to your server:
@@ -75,6 +63,14 @@ If there are no *user client* connected for a user, any notifications
 for them must be silently ignored. *user clients* expect to be notified of
 events **in the correct order**, regardless of the order in which the
 *event source* sent them.
+
+### Solution
+
+## Assumptions
+
+1. When server is restarted it does not need to pick up where it left off (offset by last sequence number)
+
+
 
 ### The Configuration
 
