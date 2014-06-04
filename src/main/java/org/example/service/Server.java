@@ -33,6 +33,7 @@ public class Server {
 		startEventThread();
 		LOG.info("Event thread started");
 		shutDownHook();
+		LOG.info("Ctrl-C to shut down");
 	}
 
 	private void shutDownHook() {

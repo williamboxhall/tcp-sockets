@@ -8,18 +8,18 @@ import org.example.domain.UserRepository;
 
 public class Dispatcher {
 	private final UserRepository userRepository;
-	private long lastDispatchedSeqNo = 0;
+	private long nextToDispatch = 1;
 
 	public Dispatcher(UserRepository userRepository) {
 		this.userRepository = userRepository;
 	}
 
 	void drainQueuedEventsInOrder(Map<Long, Event> eventQueue) throws IOException {
-		while (!eventQueue.isEmpty()) {
-			lastDispatchedSeqNo++;
-			Event event = eventQueue.get(lastDispatchedSeqNo);
+		while (eventQueue.get(nextToDispatch) != null) {
+			Event event = eventQueue.get(nextToDispatch);
 			event.type().informUsers(event, userRepository);
-			eventQueue.remove(lastDispatchedSeqNo);
+			eventQueue.remove(nextToDispatch);
+			nextToDispatch++;
 		}
 	}
 }
