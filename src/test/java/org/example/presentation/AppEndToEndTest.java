@@ -50,7 +50,7 @@ public class AppEndToEndTest {
 		assertThat(readLine(client), is("4|F|3|1"));
 	}
 
-	private void assertClientsMayDisconnectAndReconnect() throws IOException {
+	private void assertClientsMayDisconnectAndReconnect() throws IOException, InterruptedException {
 		write(eventSource, "5|B");
 		assertThat(readLine(client), is("5|B"));
 
@@ -59,8 +59,10 @@ public class AppEndToEndTest {
 		client = new Socket("localhost", CLIENT_PORT);
 		write(client, "1");
 
-		write(eventSource, "7|B");
-		assertThat(readLine(client), is("7|B"));
+		write(eventSource, "7|F|3|4");
+		write(eventSource, "8|U|3|4");
+		write(eventSource, "9|B");
+		assertThat(readLine(client), is("9|B"));
 	}
 
 	private static void write(Socket socket, String message) throws IOException {

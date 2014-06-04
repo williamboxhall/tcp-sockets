@@ -4,6 +4,7 @@ import static org.example.infrastructure.Logger.LOG;
 
 import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -20,7 +21,7 @@ public class Server {
 	private final int eventSourcePort;
 	private final int clientPort;
 	private final UserRepository userRepository;
-	private volatile boolean moribund = false;
+	private volatile boolean stopRequested = false;
 
 	public Server(int eventSourcePort, int clientPort, boolean debug) {
 		this.eventSourcePort = eventSourcePort;
@@ -42,7 +43,7 @@ public class Server {
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
 				LOG.info("Shutting down. Closing all sockets.");
-				moribund = true;
+				stopRequested = true;
 			}
 		});
 	}
@@ -58,8 +59,9 @@ public class Server {
 					LOG.info("SUCCESS");
 					Map<Long, Event> eventQueue = new HashMap<>();
 					Dispatcher dispatcher = new Dispatcher(userRepository);
-					while (!moribund) {
-						enqueueNextBatchOfEvents(eventSource, eventQueue);
+					InputStream inputStream = eventSource.getInputStream();
+					while (!stopRequested) {
+						enqueueNextBatchOfEvents(inputStream, eventQueue);
 						dispatcher.drainQueuedEventsInOrder(eventQueue);
 					}
 				} catch (IOException e) {
@@ -77,8 +79,8 @@ public class Server {
 		}, "events").start();
 	}
 
-	private static void enqueueNextBatchOfEvents(Socket eventSource, Map<Long, Event> eventQueue) throws IOException {
-		BufferedReader in = new BufferedReader(new InputStreamReader(eventSource.getInputStream()));
+	private static void enqueueNextBatchOfEvents(InputStream inputStream, Map<Long, Event> eventQueue) throws IOException {
+		BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
 		while (in.ready()) {
 			Event event = new Event(in.readLine());
 			eventQueue.put(event.sequenceNumber(), event);
@@ -91,7 +93,7 @@ public class Server {
 			public void run() {
 				try {
 					ServerSocket serverSocket = new ServerSocket(clientPort);
-					while (!moribund) {
+					while (!stopRequested) {
 						acceptNewClients(serverSocket.accept(), userRepository);
 					}
 				} catch (IOException e) {
