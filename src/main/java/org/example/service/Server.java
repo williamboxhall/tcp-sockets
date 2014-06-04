@@ -49,7 +49,7 @@ public class Server {
 	}
 
 	private void startEventThread() {
-		new Thread(new Runnable() {
+		new Thread("events") {
 			@Override
 			public void run() {
 				Socket eventSource = null;
@@ -60,8 +60,9 @@ public class Server {
 					Map<Long, Event> eventQueue = new HashMap<>();
 					Dispatcher dispatcher = new Dispatcher(userRepository);
 					InputStream inputStream = eventSource.getInputStream();
+					BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
 					while (!stopRequested) {
-						enqueueNextBatchOfEvents(inputStream, eventQueue);
+						enqueueNextBatchOfEvents(in, eventQueue);
 						dispatcher.drainQueuedEventsInOrder(eventQueue);
 					}
 				} catch (IOException e) {
@@ -76,12 +77,11 @@ public class Server {
 					}
 				}
 			}
-		}, "events").start();
+		}.start();
 	}
 
-	private static void enqueueNextBatchOfEvents(InputStream inputStream, Map<Long, Event> eventQueue) throws IOException {
-		BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
-		while (in.ready()) {
+	private static void enqueueNextBatchOfEvents(BufferedReader in, Map<Long, Event> eventQueue) throws IOException {
+		if (in.ready()) {
 			Event event = new Event(in.readLine());
 			eventQueue.put(event.sequenceNumber(), event);
 		}
