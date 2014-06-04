@@ -3,6 +3,9 @@ package org.example.service;
 import static org.example.infrastructure.Logger.LOG;
 import static org.example.infrastructure.ShutdownHooks.closed;
 import static org.example.infrastructure.ShutdownHooks.ensure;
+import static org.example.infrastructure.Sockets.accept;
+import static org.example.infrastructure.Sockets.integerFrom;
+import static org.example.infrastructure.Sockets.socketServerFor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -18,6 +21,7 @@ import org.example.domain.UserFactory;
 import org.example.domain.UserRepository;
 import org.example.infrastructure.ConnectionFactory;
 import org.example.infrastructure.Logger;
+import org.example.infrastructure.Sockets;
 
 public class Server {
 	private final int eventSourcePort;
@@ -33,28 +37,28 @@ public class Server {
 	}
 
 	public void start() {
-		startClientsThread();
+		clientsThread().start();
 		LOG.info("Client thread started");
-		startEventThread();
+		eventThread().start();
 		LOG.info("Event thread started");
 		LOG.info("Ctrl-C to shut down");
 	}
 
-	private void startEventThread() {
-		new Thread("events") {
+	private Thread eventThread() {
+		return new Thread("events") {
 			@Override
 			public void run() {
+				LOG.info("Running. Awaiting event source connection... ");
+				final Socket eventSource = Sockets.accept(socketServerFor(eventSourcePort));
+
+				LOG.info("SUCCESS");
+				Map<Long, Event> eventQueue = new HashMap<>();
+				Dispatcher dispatcher = new Dispatcher(userRepository);
 				try {
-					LOG.info("Running. Awaiting event source connection... ");
-					final Socket eventSource = new ServerSocket(eventSourcePort).accept();
-					LOG.info("SUCCESS");
-					Map<Long, Event> eventQueue = new HashMap<>();
-					Dispatcher dispatcher = new Dispatcher(userRepository);
 					InputStream inputStream = eventSource.getInputStream();
 					BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
 
 					ensure(closed(eventSource));
-
 
 					while (!stopRequested) {
 						String raw = in.readLine();
@@ -65,34 +69,23 @@ public class Server {
 						dispatcher.drainQueuedEventsInOrder(eventQueue);
 					}
 				} catch (IOException e) {
-					e.printStackTrace();
+					throw new RuntimeException(e);
 				}
 			}
-		}.start();
+		};
 	}
 
-	private void startClientsThread() {
-		new Thread(new Runnable() {
+	private Thread clientsThread() {
+		return new Thread("clients") {
 			@Override
 			public void run() {
-				try {
-					ServerSocket serverSocket = new ServerSocket(clientPort);
-
-					ensure(closed(userRepository));
-					while (!stopRequested) {
-						acceptNewClients(serverSocket.accept(), userRepository);
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
+				ensure(closed(userRepository));
+				ServerSocket server = socketServerFor(clientPort);
+				while (!stopRequested) {
+					Socket client = accept(server);
+					userRepository.connect(integerFrom(client), client);
 				}
 			}
-		}, "clients").start();
+		};
 	}
-
-	private static void acceptNewClients(Socket clientSocket, UserRepository userRepository) throws IOException {
-		BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-		int userId = Integer.parseInt(in.readLine());
-		userRepository.connect(userId, clientSocket);
-	}
-
 }

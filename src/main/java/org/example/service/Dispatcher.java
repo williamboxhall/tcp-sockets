@@ -1,6 +1,5 @@
 package org.example.service;
 
-import java.io.IOException;
 import java.util.Map;
 
 import org.example.domain.Event;
@@ -14,7 +13,7 @@ public class Dispatcher {
 		this.userRepository = userRepository;
 	}
 
-	void drainQueuedEventsInOrder(Map<Long, Event> eventQueue) throws IOException {
+	void drainQueuedEventsInOrder(Map<Long, Event> eventQueue) {
 		while (nextEventIsReady(eventQueue)) {
 			Event event = eventQueue.get(nextToDispatch);
 			event.type().informUsers(event, userRepository);
