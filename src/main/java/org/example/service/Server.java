@@ -1,6 +1,8 @@
 package org.example.service;
 
 import static org.example.infrastructure.Logger.LOG;
+import static org.example.infrastructure.ShutdownHooks.closed;
+import static org.example.infrastructure.ShutdownHooks.ensure;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -51,17 +53,7 @@ public class Server {
 					InputStream inputStream = eventSource.getInputStream();
 					BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
 
-					ensure(new Runnable() {
-						@Override
-						public void run() {
-							try {
-								eventSource.close();
-								LOG.info("Event source socket closed");
-							} catch (IOException e) {
-								e.printStackTrace();
-							}
-						}
-					});
+					ensure(closed(eventSource));
 
 
 					while (!stopRequested) {
@@ -86,13 +78,7 @@ public class Server {
 				try {
 					ServerSocket serverSocket = new ServerSocket(clientPort);
 
-					ensure(new Runnable() {
-						public void run() {
-							userRepository.disconnectAll();
-							LOG.info("All client sockets closed");
-						}
-					});
-
+					ensure(closed(userRepository));
 					while (!stopRequested) {
 						acceptNewClients(serverSocket.accept(), userRepository);
 					}
@@ -109,7 +95,4 @@ public class Server {
 		userRepository.connect(userId, clientSocket);
 	}
 
-	private void ensure(Runnable runnable) {
-		Runtime.getRuntime().addShutdownHook(new Thread(runnable));
-	}
 }

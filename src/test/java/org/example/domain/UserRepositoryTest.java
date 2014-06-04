@@ -65,7 +65,7 @@ public class UserRepositoryTest {
 		when(userFactory.create()).thenReturn(user).thenReturn(anotherUser);
 		userRepository.get(UNKNOWN_USER_ID);
 		userRepository.get(ANOTHER_USER_ID);
-		userRepository.disconnectAll();
+		userRepository.close();
 		verify(user).disconnect();
 		verify(anotherUser).disconnect();
 	}

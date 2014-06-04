@@ -4,6 +4,7 @@ import static java.lang.String.format;
 import static java.lang.String.valueOf;
 import static org.example.infrastructure.Logger.LOG;
 
+import java.io.Closeable;
 import java.net.Socket;
 import java.util.HashSet;
 import java.util.Map;
@@ -12,7 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import org.example.infrastructure.ConnectionFactory;
 
-public class UserRepository {
+public class UserRepository implements Closeable {
 	private final Map<Integer, User> users = new ConcurrentHashMap<>(); // TODO read more about this
 	private final UserFactory userFactory;
 	private final ConnectionFactory connectionFactory;
@@ -38,7 +39,7 @@ public class UserRepository {
 		return new HashSet<>(users.values());
 	}
 
-	public void disconnectAll() {
+	public void close() {
 		for (User user : allUsers()) {
 			user.disconnect();
 		}
