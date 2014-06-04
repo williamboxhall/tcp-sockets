@@ -14,6 +14,7 @@ public class Event {
 		this.type = EventType.byId(parts[1]);
 		this.fromUserId = parts.length <= 2 ? null : Integer.valueOf(parts[2]);
 		this.toUserId = parts.length <= 3 ? null : Integer.valueOf(parts[3]);
+		// TODO better handling for malformed events
 	}
 
 	public long sequenceNumber() {
