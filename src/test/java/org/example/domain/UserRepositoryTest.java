@@ -1,16 +1,13 @@
 package org.example.domain;
 
-import static java.lang.String.valueOf;
+import static org.example.domain.UserRepository.UserFactory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.net.Socket;
 
-import org.example.infrastructure.Connection;
-import org.example.infrastructure.ConnectionFactory;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
@@ -25,15 +22,11 @@ public class UserRepositoryTest {
 	@Mock
 	private Socket socket;
 	@Mock
-	private ConnectionFactory connectionFactory;
-	@Mock
 	private UserFactory userFactory;
 	@Mock
 	private User user;
 	@Mock
 	private User anotherUser;
-	@Mock
-	private Connection connection;
 
 	@InjectMocks
 	private UserRepository userRepository;
@@ -45,28 +38,10 @@ public class UserRepositoryTest {
 	}
 
 	@Test
-	public void shouldUpdateConnectionForUnknownUser() {
-		when(userFactory.create()).thenReturn(user);
-		when(connectionFactory.createFor(socket, valueOf(UNKNOWN_USER_ID))).thenReturn(connection);
-		userRepository.connect(UNKNOWN_USER_ID, socket);
-		verify(user).updateConnection(connection);
-	}
-
-	@Test
 	public void shouldExposeAllUserIds() {
 		when(userFactory.create()).thenReturn(user).thenReturn(anotherUser);
 		userRepository.get(UNKNOWN_USER_ID);
-		userRepository.connect(ANOTHER_USER_ID, socket);
-		assertThat(userRepository.allUsers(), containsInAnyOrder(user, anotherUser));
-	}
-
-	@Test
-	public void shouldDisconnectAllUsers() {
-		when(userFactory.create()).thenReturn(user).thenReturn(anotherUser);
-		userRepository.get(UNKNOWN_USER_ID);
 		userRepository.get(ANOTHER_USER_ID);
-		userRepository.close();
-		verify(user).disconnect();
-		verify(anotherUser).disconnect();
+		assertThat(userRepository.allUserIds(), containsInAnyOrder(UNKNOWN_USER_ID, ANOTHER_USER_ID));
 	}
 }

@@ -1,31 +1,16 @@
 package org.example.domain;
 
-import static java.lang.String.format;
-import static java.lang.String.valueOf;
-import static org.example.infrastructure.Logger.LOG;
-
-import java.io.Closeable;
-import java.net.Socket;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.example.infrastructure.ConnectionFactory;
-
-public class UserRepository implements Closeable {
+public class UserRepository {
 	private final Map<Integer, User> users = new ConcurrentHashMap<>(); // TODO read more about this
 	private final UserFactory userFactory;
-	private final ConnectionFactory connectionFactory;
 
-	public UserRepository(UserFactory userFactory, ConnectionFactory connectionFactory) {
+	public UserRepository(UserFactory userFactory) {
 		this.userFactory = userFactory;
-		this.connectionFactory = connectionFactory;
-	}
-
-	public void connect(int userId, Socket socket) { // TODO take connection here instead?
-		get(userId).updateConnection(connectionFactory.createFor(socket, valueOf(userId)));
-		LOG.info(format("User %s connected", userId));
 	}
 
 	public User get(int userId) {
@@ -35,13 +20,13 @@ public class UserRepository implements Closeable {
 		return users.get(userId);
 	}
 
-	public Set<User> allUsers() {
-		return new HashSet<>(users.values());
+	public Set<Integer> allUserIds() {
+		return new HashSet<>(users.keySet());
 	}
 
-	public void close() {
-		for (User user : allUsers()) {
-			user.disconnect();
+	public static class UserFactory {
+		public User create() {
+			return new User();
 		}
 	}
 }

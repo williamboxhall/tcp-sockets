@@ -17,22 +17,20 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.example.domain.Event;
-import org.example.domain.UserFactory;
 import org.example.domain.UserRepository;
-import org.example.infrastructure.ConnectionFactory;
 import org.example.infrastructure.Logger;
 import org.example.infrastructure.Sockets;
 
 public class Server {
 	private final int eventSourcePort;
 	private final int clientPort;
-	private final UserRepository userRepository;
+	private final Dispatcher dispatcher;
 	private volatile boolean stopRequested = false;
 
-	public Server(int eventSourcePort, int clientPort, boolean debug) {
+	public Server(int eventSourcePort, int clientPort, boolean debug, Map<Integer, Socket> registry) {
 		this.eventSourcePort = eventSourcePort;
 		this.clientPort = clientPort;
-		this.userRepository = new UserRepository(new UserFactory(), new ConnectionFactory());
+		this.dispatcher = new Dispatcher(new UserRepository(new UserRepository.UserFactory()), registry);
 		Logger.DEBUG = debug;
 	}
 
@@ -53,7 +51,7 @@ public class Server {
 
 				LOG.info("SUCCESS");
 				Map<Long, Event> eventQueue = new HashMap<>();
-				Dispatcher dispatcher = new Dispatcher(userRepository);
+
 				try {
 					InputStream inputStream = eventSource.getInputStream();
 					BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
@@ -79,11 +77,11 @@ public class Server {
 		return new Thread("clients") {
 			@Override
 			public void run() {
-				ensure(closed(userRepository));
+				ensure(closed(dispatcher));
 				ServerSocket server = socketServerFor(clientPort);
 				while (!stopRequested) {
 					Socket client = accept(server);
-					userRepository.connect(integerFrom(client), client);
+					dispatcher.connect(integerFrom(client), client);
 				}
 			}
 		};

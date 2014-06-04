@@ -33,4 +33,11 @@ public class Sockets {
 			throw new RuntimeException(e);
 		}
 	}
+
+	public static void closeQuietly(Socket socket) {
+		try {
+			socket.close();
+		} catch (IOException e) {
+		}
+	}
 }
