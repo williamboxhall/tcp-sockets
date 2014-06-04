@@ -4,6 +4,7 @@ import static org.example.presentation.App.CLIENT_PORT;
 import static org.example.presentation.App.EVENT_SOURCE_PORT;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.fail;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import java.net.Socket;
 
 import org.example.domain.Event;
 import org.example.infrastructure.SocketConnection;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class AppEndToEndTest {
@@ -37,18 +39,27 @@ public class AppEndToEndTest {
 	}
 
 	@Test
+	@Ignore
 	public void clientAndEventSourceComingGoingAndReturning() {
-
+		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void eventSequenceNumberGreatThanMaxInteger() {
-
+		fail("Not yet implemented");
 	}
 
 	@Test
+	@Ignore
 	public void eventsArrivingOutOfOrder() {
+		fail("Not yet implemented");
+	}
 
+	@Test
+	@Ignore
+	public void sameEventSequenceNumberSeenTwice() {
+		fail("Not yet implemented");
 	}
 
 	private void waitUntilReady(BufferedReader reader) throws IOException {
