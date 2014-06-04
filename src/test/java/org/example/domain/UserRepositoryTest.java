@@ -1,4 +1,4 @@
-package org.example;
+package org.example.domain;
 
 import static java.lang.String.valueOf;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -9,9 +9,6 @@ import static org.mockito.Mockito.when;
 
 import java.net.Socket;
 
-import org.example.domain.User;
-import org.example.domain.UserFactory;
-import org.example.domain.UserRepository;
 import org.example.infrastructure.Connection;
 import org.example.infrastructure.ConnectionFactory;
 import org.junit.Test;

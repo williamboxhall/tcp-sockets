@@ -1,4 +1,4 @@
-package org.example;
+package org.example.infrastructure;
 
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.verify;
@@ -6,8 +6,6 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
 import org.example.domain.Event;
-import org.example.infrastructure.Connection;
-import org.example.infrastructure.FallbackConnection;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;

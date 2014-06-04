@@ -1,4 +1,4 @@
-package org.example;
+package org.example.domain;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.contains;
@@ -6,8 +6,6 @@ import static org.hamcrest.Matchers.not;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyZeroInteractions;
 
-import org.example.domain.Event;
-import org.example.domain.User;
 import org.example.infrastructure.Connection;
 import org.junit.Before;
 import org.junit.Test;
