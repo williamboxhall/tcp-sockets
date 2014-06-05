@@ -115,7 +115,7 @@ allow the `clients` thread to share client sockets to the `events` thread withou
 The looping threads will block on socket IO operations `ServerSocket.accept()` and
 `ServerSocket.getInputStream().read()` instead of the unneeded processing for spinlock-style polling on resources.
 
-##### Code quality
+#### Code quality
 
 The code was written closely following the Clean Code (Uncle Bob) / Effective Java (Josh Bloch) idioms.
 
