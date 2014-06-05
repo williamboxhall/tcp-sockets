@@ -21,25 +21,26 @@ public class Router implements Consumer<Event> {
 		this.registry = registry;
 	}
 
+	@Override
 	public void accept(Event event) {
-		for (int userId : event.updateAndReturnRecipients(userRepository)) {
-			notify(event, userId);
+		for (int recipient : event.updateAndReturnRecipients(userRepository)) {
+			notify(event, recipient);
 		}
 	}
 
-	private void notify(Event event, int userId) {
+	private void notify(Event event, int recipient) {
 		try {
-			Socket socket = registry.get(userId);
+			Socket socket = registry.get(recipient);
 			if (socket != null) {
 				new PrintWriter(socket.getOutputStream(), true).println(event.raw());
-				LOG.debug(format("Sent event %s to user %s", event, userId));
+				LOG.debug(format("Sent event %s to user %s", event, recipient));
 			} else {
-				LOG.debug(format("Dropped event %s to user %s", event, userId));
+				LOG.debug(format("Dropped event %s to user %s", event, recipient));
 			}
 		} catch (IOException e) {
-			LOG.info(format("User %s disconnected", userId));
-			disconnect(userId);
-			LOG.debug(format("Dropped event %s to user %s", event, userId));
+			LOG.info(format("User %s disconnected", recipient));
+			disconnect(recipient);
+			LOG.debug(format("Dropped event %s to user %s", event, recipient));
 		}
 	}
 
