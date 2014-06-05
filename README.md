@@ -66,20 +66,18 @@ events **in the correct order**, regardless of the order in which the
 
 ### Assumptions
 
-1. Supports clients disconnecting/reconnecting but assumes one-off event source connection
-2. When server is restarted it does not need to pick up where it left off (offset by last sequence number)
-
+1. When server is restarted it does not need to pick up where it left off (offset by last sequence number)
 
 ### Running
 
 #### Production
 
-`mvn clean compile exec:java -Dexec.mainClass="org.example.presentation.App"`
+`mvn clean compile exec:java -DskipTests -Dexec.mainClass="org.example.presentation.App"`
 
 or from project root
 
 `
-mvn clean package
+mvn clean package -DskipTests
 java -jar target/follower-maze-0.0.1-SNAPSHOT.jar
 `
 

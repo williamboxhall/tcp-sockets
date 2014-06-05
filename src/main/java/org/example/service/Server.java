@@ -45,25 +45,23 @@ public class Server {
 		return new Thread("events") {
 			@Override
 			public void run() {
-				LOG.info("Running. Awaiting event source connection... ");
-				final Socket eventSource = Sockets.accept(socketServerFor(eventSourcePort));
-
-				LOG.info("SUCCESS");
-				Map<Long, Event> eventQueue = new HashMap<>();
-
 				try {
-					InputStream inputStream = eventSource.getInputStream();
-					BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
+					Map<Long, Event> eventQueue = new HashMap<>();
 
-					ensureOnExit(closed(eventSource));
-					String raw = in.readLine();
-					while (raw != null) {
-						Event event = new Event(raw);
-						eventQueue.put(event.sequenceNumber(), event);
-						router.drainQueuedEventsInOrder(eventQueue);
-						raw = in.readLine();
+					while (true) {
+						final Socket eventSource = Sockets.accept(socketServerFor(eventSourcePort));
+						InputStream inputStream = eventSource.getInputStream();
+						BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
+
+						ensureOnExit(closed(eventSource));
+						String raw = in.readLine();
+						while (raw != null) {
+							Event event = new Event(raw);
+							eventQueue.put(event.sequenceNumber(), event);
+							router.drainQueuedEventsInOrder(eventQueue);
+							raw = in.readLine();
+						}
 					}
-					LOG.info("No more events, stopping event source thread");
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}

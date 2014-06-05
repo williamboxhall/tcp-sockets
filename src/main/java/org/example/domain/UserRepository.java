@@ -1,12 +1,12 @@
 package org.example.domain;
 
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class UserRepository {
-	private final Map<Integer, User> users = new ConcurrentHashMap<>(); // TODO read more about this
+	private final Map<Integer, User> users = new HashMap<>();
 	private final UserFactory userFactory;
 
 	public UserRepository(UserFactory userFactory) {
