@@ -96,21 +96,21 @@ https://travis-ci.org/williamboxhall/follower-maze/builds
 
 #### Performance
 
-##### Out-of-order events
+###### Out-of-order events
 
 An unlimited amount of events may arrive out of order. In order to handle this efficiently, a hash table (`HashMap`) is
 used in combination with tracking the next required sequence number. A backlog of events will be kept until
 the next in sequence arrives and the backlog can be drained. The HashSet ensures constant-time (O(n)) lookups
 and removes the overhead of sorting or searching in the backlog.
 
-##### Threads
+###### Threads
 
 Single-threaded eventloop apps may be slowed down when multiple clients are connecting at the same time as events
 arriving. Splitting these in to two threads, `clients` and `events`, can stop these activities from interfering with
 each other and allow the simultaneous use of two cores in multi-core CPUs. The threads use a `ConcurrentHashMap` to
 allow the `clients` thread to share client sockets to the `events` thread without breaking thread-safety.
 
-##### Sockets
+###### Sockets
 
 The looping threads will block on socket IO operations `ServerSocket.accept()` and
 `ServerSocket.getInputStream().read()` instead of the unneeded processing for spinlock-style polling on resources.
