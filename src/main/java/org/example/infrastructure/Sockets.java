@@ -31,6 +31,15 @@ public class Sockets {
 		}
 	}
 
+	public static void untilEmpty(Socket socket, Consumer<String> consumer) {
+		BufferedReader bufferedReader = bufferedReaderFor(socket);
+		String line = readLine(bufferedReader);
+		while (line != null) {
+			consumer.accept(line);
+			line = readLine(bufferedReader);
+		}
+	}
+
 	public static BufferedReader bufferedReaderFor(Socket socket) {
 		try {
 			return new BufferedReader(new InputStreamReader(socket.getInputStream()));
