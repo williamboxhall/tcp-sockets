@@ -4,7 +4,7 @@ import static java.lang.String.format;
 
 public class Logger {
 	public static final Logger LOG = new Logger();
-	public static boolean DEBUG = true;
+	public static boolean DEBUG = false;
 
 	private Logger() {
 	}
