@@ -12,7 +12,7 @@ public class Sockets {
 	private Sockets() {
 	}
 
-	public static ServerSocket socketServerFor(int port) {
+	public static ServerSocket serverFor(int port) {
 		try {
 			ServerSocket serverSocket = new ServerSocket();
 			serverSocket.setReuseAddress(true);

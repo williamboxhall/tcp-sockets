@@ -2,45 +2,51 @@ package org.example.domain;
 
 import static org.example.domain.EventType.checkNotNull;
 
+import java.util.Set;
+
 public class Event {
 	private final String raw;
 	private final long sequenceNumber;
 	private final EventType type;
-	private final Integer fromUserId;
-	private final Integer toUserId;
+	private final Integer fromUser;
+	private final Integer toUser;
 
 	public Event(String raw) {
 		this.raw = checkNotNull(raw);
 		String[] parts = raw.split("\\|");
 		this.sequenceNumber = Long.parseLong(parts[0]);
 		this.type = EventType.byId(parts[1]);
-		this.fromUserId = parts.length <= 2 ? null : Integer.valueOf(parts[2]);
-		this.toUserId = parts.length <= 3 ? null : Integer.valueOf(parts[3]);
-		// TODO better handling for malformed events
+		this.fromUser = parts.length <= 2 ? null : Integer.valueOf(parts[2]);
+		this.toUser = parts.length <= 3 ? null : Integer.valueOf(parts[3]);
 	}
 
 	public long sequenceNumber() {
 		return sequenceNumber;
 	}
 
-	public EventType type() {
+	public String raw() {
+		return raw;
+	}
+
+	// TODO remove these
+	EventType type() {
 		return type;
 	}
 
-	public int fromUserId() {
-		return fromUserId;
+	int fromUser() {
+		return fromUser;
 	}
 
-	public int toUserId() {
-		return toUserId;
-	}
-
-	public String raw() {
-		return raw;
+	int toUser() {
+		return toUser;
 	}
 
 	@Override
 	public String toString() {
 		return raw;
+	}
+
+	public Set<Integer> recipients(UserRepository userRepository) {
+		return type.recipientsFor(fromUser, toUser, userRepository);
 	}
 }

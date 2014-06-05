@@ -15,8 +15,8 @@ public class EventTest {
 		assertThat(event.raw(), is("1|F|2|3"));
 		assertThat(event.sequenceNumber(), is(1L));
 		assertThat(event.type(), is(FOLLOW));
-		assertThat(event.fromUserId(), is(2));
-		assertThat(event.toUserId(), is(3));
+		assertThat(event.fromUser(), is(2));
+		assertThat(event.toUser(), is(3));
 	}
 
 	@Test
@@ -26,12 +26,12 @@ public class EventTest {
 		assertThat(event.sequenceNumber(), is(1L));
 		assertThat(event.type(), is(BROADCAST));
 		try {
-			event.fromUserId();
+			event.fromUser();
 			fail("fromUserId should have thrown NPE");
 		} catch (NullPointerException e) {
 		}
 		try {
-			event.toUserId();
+			event.toUser();
 			fail("toUserId should have thrown NPE");
 		} catch (NullPointerException e) {
 		}

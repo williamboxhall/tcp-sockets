@@ -6,7 +6,7 @@ import static org.example.infrastructure.Logger.LOG;
 import static org.example.infrastructure.ShutdownHooks.ensureClosedOnExit;
 import static org.example.infrastructure.Sockets.accept;
 import static org.example.infrastructure.Sockets.integerFrom;
-import static org.example.infrastructure.Sockets.socketServerFor;
+import static org.example.infrastructure.Sockets.serverFor;
 import static org.example.infrastructure.Sockets.untilEmpty;
 
 import java.net.ServerSocket;
@@ -41,7 +41,7 @@ public class Server {
 		return new Thread("events") {
 			@Override
 			public void run() {
-				ServerSocket server = socketServerFor(eventSourcePort);
+				ServerSocket server = serverFor(eventSourcePort);
 				while (true) {
 					untilEmpty(ensureClosedOnExit(accept(server)), sendTo(router));
 				}
@@ -53,7 +53,7 @@ public class Server {
 		return new Thread("clients") {
 			@Override
 			public void run() {
-				ServerSocket server = socketServerFor(clientPort);
+				ServerSocket server = serverFor(clientPort);
 				while (true) {
 					Socket client = ensureClosedOnExit(accept(server));
 					router.connect(integerFrom(client), client);

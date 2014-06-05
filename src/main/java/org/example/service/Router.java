@@ -22,7 +22,7 @@ public class Router implements Consumer<Event> {
 	}
 
 	public void accept(Event event) {
-		for (int userId : event.type().recipientsFor(event, userRepository)) {
+		for (int userId : event.recipients(userRepository)) {
 			notify(event, userId);
 		}
 	}

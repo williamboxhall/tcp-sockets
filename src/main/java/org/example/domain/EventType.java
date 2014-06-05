@@ -4,46 +4,45 @@ import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 public enum EventType {
 	FOLLOW("F") {
-		public Set<Integer> recipientsFor(Event event, UserRepository userRepository) {
-			User user = userRepository.get(event.toUserId());
-			user.addFollower(event.fromUserId());
-			return singleton(event.toUserId());
+		Set<Integer> recipientsFor(Integer fromUser, Integer toUser, UserRepository userRepository) {
+			User user = userRepository.get(toUser);
+			user.addFollower(fromUser);
+			return singleton(toUser);
 		}
 	},
 	UNFOLLOW("U") {
 		@Override
-		public Set<Integer> recipientsFor(Event event, UserRepository userRepository) {
-			userRepository.get(event.toUserId()).removeFollower(event.fromUserId());
+		Set<Integer> recipientsFor(Integer fromUser, Integer toUser, UserRepository userRepository) {
+			userRepository.get(toUser).removeFollower(fromUser);
 			return emptySet();
 		}
 	},
 	BROADCAST("B") {
 		@Override
-		public Set<Integer> recipientsFor(Event event, UserRepository userRepository) {
-			return new HashSet<>(userRepository.allUserIds());
+		Set<Integer> recipientsFor(Integer fromUser, Integer toUser, UserRepository userRepository) {
+			return userRepository.allUserIds();
 		}
 	},
 	PRIVATE_MESSAGE("P") {
 		@Override
-		public Set<Integer> recipientsFor(Event event, UserRepository userRepository) {
-			return singleton(event.toUserId());
+		Set<Integer> recipientsFor(Integer fromUser, Integer toUser, UserRepository userRepository) {
+			return singleton(toUser);
 		}
 
 	},
 	STATUS_UPDATE("S") {
 		@Override
-		public Set<Integer> recipientsFor(Event event, UserRepository userRepository) {
-			return userRepository.get(event.fromUserId()).getFollowers();
+		Set<Integer> recipientsFor(Integer fromUser, Integer toUser, UserRepository userRepository) {
+			return userRepository.get(fromUser).getFollowers();
 		}
 	};
 
-	public abstract Set<Integer> recipientsFor(Event event, UserRepository userRepository);
+	abstract Set<Integer> recipientsFor(Integer fromUser, Integer toUser, UserRepository userRepository);
 
 	private static final Map<String, EventType> CACHE_BY_ID = new HashMap<>();
 
