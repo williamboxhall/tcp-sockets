@@ -34,7 +34,7 @@ public class AppEndToEndTest {
 		// App sockets closed by shutdown hook
 	}
 
-	@Test // TODO attempt disconnect reconnect stuff with reuse port
+	@Test
 	public void clientReceivesOnlyRelevantEventsInSequentialOrder() throws IOException, InterruptedException {
 		eventSource = new Socket("localhost", EVENT_SOURCE_PORT);
 
