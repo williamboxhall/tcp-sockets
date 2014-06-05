@@ -100,8 +100,8 @@ https://travis-ci.org/williamboxhall/follower-maze/builds
 
 An unlimited amount of events may arrive out of order. In order to handle this efficiently, a hash table (`HashMap`) is
 used in combination with tracking the next required sequence number. A backlog of events will be kept until
-the next in sequence arrives and the backlog can be drained. The hash table ensures constant-time (O(1)) lookups
-and removes the overhead of sorting or searching in the backlog.
+the next in sequence arrives and the backlog can be drained. The hash table ensures constant-time (O(1)) stores &
+lookups, and removes the overhead of sorting or searching in the backlog.
 
 ###### Threads
 
