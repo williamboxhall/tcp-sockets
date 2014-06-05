@@ -89,7 +89,9 @@ example usage: java -jar app.jar 1234 5678 true
 ```mvn clean test```
 
 All classes fully unit tested except for the threaded entry-point which is covered by an end-to-end integration test
-`AppEndToEndTest.java`. Every commit is built by a Continuous Integration build on [Travis](https://travis-ci.org/williamboxhall/follower-maze/builds)
+[`AppEndToEndTest.java`](https://github.com/williamboxhall/follower-maze/blob/master/src/test/java/org/example/presentation/AppEndToEndTest.java). 
+Every commit is built by a Continuous Integration build on 
+[Travis](https://travis-ci.org/williamboxhall/follower-maze/builds)
 
 ### Considerations
 
