@@ -20,11 +20,10 @@ public class EventQueue implements Consumer<String> {
 
 	@Override
 	public void accept(String raw) {
-		Event event = new Event(raw);
+		Event event = new Event(raw); // TODO handling for bad event
 		eventQueue.put(event.sequenceNumber(), event);
 		while (eventQueue.containsKey(nextSequenceNo)) {
-			consumer.accept(event);
-			eventQueue.remove(nextSequenceNo);
+			consumer.accept(eventQueue.remove(nextSequenceNo));
 			nextSequenceNo++;
 		}
 	}
