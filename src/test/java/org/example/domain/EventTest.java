@@ -1,40 +1,35 @@
 package org.example.domain;
 
-import static org.example.domain.EventType.BROADCAST;
-import static org.example.domain.EventType.FOLLOW;
 import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.fail;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.runners.MockitoJUnitRunner;
 
+@RunWith(MockitoJUnitRunner.class)
 public class EventTest {
+	@Mock
+	private UserRepository userRepository;
+	@Mock
+	private User user;
+
 	@Test
 	public void parsesPropertiesFromInput() {
 		Event event = new Event("1|F|2|3");
 		assertThat(event.raw(), is("1|F|2|3"));
 		assertThat(event.sequenceNumber(), is(1L));
-		assertThat(event.type(), is(FOLLOW));
-		assertThat(event.fromUser(), is(2));
-		assertThat(event.toUser(), is(3));
 	}
 
 	@Test
-	public void lazyNullPointersOnMissingUserIds() {
-		Event event = new Event("1|B");
-		assertThat(event.raw(), is("1|B"));
-		assertThat(event.sequenceNumber(), is(1L));
-		assertThat(event.type(), is(BROADCAST));
-		try {
-			event.fromUser();
-			fail("fromUserId should have thrown NPE");
-		} catch (NullPointerException e) {
-		}
-		try {
-			event.toUser();
-			fail("toUserId should have thrown NPE");
-		} catch (NullPointerException e) {
-		}
+	public void managesRecipients() {
+		when(userRepository.get(3)).thenReturn(user);
+		assertThat(new Event("1|F|2|3").updateAndReturnRecipients(userRepository), containsInAnyOrder(3));
+		verify(user).addFollower(2);
 	}
 
 	@Test(expected = IllegalArgumentException.class)

@@ -28,25 +28,12 @@ public class Event {
 		return raw;
 	}
 
-	// TODO remove these
-	EventType type() {
-		return type;
-	}
-
-	int fromUser() {
-		return fromUser;
-	}
-
-	int toUser() {
-		return toUser;
-	}
-
 	@Override
 	public String toString() {
 		return raw;
 	}
 
-	public Set<Integer> recipients(UserRepository userRepository) {
-		return type.recipientsFor(fromUser, toUser, userRepository);
+	public Set<Integer> updateAndReturnRecipients(UserRepository userRepository) {
+		return type.updateAndReturnRecipients(fromUser, toUser, userRepository);
 	}
 }

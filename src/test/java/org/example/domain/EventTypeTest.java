@@ -35,30 +35,30 @@ public class EventTypeTest {
 	@Test
 	public void followNotifiesAndAddsFollowerToUser() {
 		assertThat(userRepository.get(JOHN).getFollowers(), not(hasItems(PAUL)));
-		assertThat(FOLLOW.recipientsFor(PAUL, JOHN, userRepository), is(containsInAnyOrder(JOHN)));
+		assertThat(FOLLOW.updateAndReturnRecipients(PAUL, JOHN, userRepository), is(containsInAnyOrder(JOHN)));
 		assertThat(userRepository.get(JOHN).getFollowers(), hasItems(PAUL));
 	}
 
 	@Test
 	public void unfollowRemovesFollowerAndNotifiesNobody() {
 		assertThat(userRepository.get(JOHN).getFollowers(), hasItems(GEORGE));
-		assertThat(UNFOLLOW.recipientsFor(GEORGE, JOHN, userRepository), is(empty()));
+		assertThat(UNFOLLOW.updateAndReturnRecipients(GEORGE, JOHN, userRepository), is(empty()));
 		assertThat(userRepository.get(JOHN).getFollowers(), not(hasItems(GEORGE)));
 	}
 
 	@Test
 	public void broadcastNotifiesEverybody() {
-		assertThat(BROADCAST.recipientsFor(null, null, userRepository), is(containsInAnyOrder(JOHN, PAUL, GEORGE, RINGO)));
+		assertThat(BROADCAST.updateAndReturnRecipients(null, null, userRepository), is(containsInAnyOrder(JOHN, PAUL, GEORGE, RINGO)));
 	}
 
 	@Test
 	public void privateMessageNotifiesRecipient() {
-		assertThat(PRIVATE_MESSAGE.recipientsFor(null, RINGO, userRepository), is(containsInAnyOrder(RINGO)));
+		assertThat(PRIVATE_MESSAGE.updateAndReturnRecipients(null, RINGO, userRepository), is(containsInAnyOrder(RINGO)));
 	}
 
 	@Test
 	public void statusUpdateNotifiesFollowers() {
-		assertThat(STATUS_UPDATE.recipientsFor(JOHN, null, userRepository), is(containsInAnyOrder(GEORGE, RINGO)));
+		assertThat(STATUS_UPDATE.updateAndReturnRecipients(JOHN, null, userRepository), is(containsInAnyOrder(GEORGE, RINGO)));
 	}
 
 	@Test

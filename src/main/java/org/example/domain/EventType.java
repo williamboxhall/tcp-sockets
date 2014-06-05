@@ -9,7 +9,7 @@ import java.util.Set;
 
 public enum EventType {
 	FOLLOW("F") {
-		Set<Integer> recipientsFor(Integer fromUser, Integer toUser, UserRepository userRepository) {
+		Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, UserRepository userRepository) {
 			User user = userRepository.get(toUser);
 			user.addFollower(fromUser);
 			return singleton(toUser);
@@ -17,32 +17,32 @@ public enum EventType {
 	},
 	UNFOLLOW("U") {
 		@Override
-		Set<Integer> recipientsFor(Integer fromUser, Integer toUser, UserRepository userRepository) {
+		Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, UserRepository userRepository) {
 			userRepository.get(toUser).removeFollower(fromUser);
 			return emptySet();
 		}
 	},
 	BROADCAST("B") {
 		@Override
-		Set<Integer> recipientsFor(Integer fromUser, Integer toUser, UserRepository userRepository) {
+		Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, UserRepository userRepository) {
 			return userRepository.allUserIds();
 		}
 	},
 	PRIVATE_MESSAGE("P") {
 		@Override
-		Set<Integer> recipientsFor(Integer fromUser, Integer toUser, UserRepository userRepository) {
+		Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, UserRepository userRepository) {
 			return singleton(toUser);
 		}
 
 	},
 	STATUS_UPDATE("S") {
 		@Override
-		Set<Integer> recipientsFor(Integer fromUser, Integer toUser, UserRepository userRepository) {
+		Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, UserRepository userRepository) {
 			return userRepository.get(fromUser).getFollowers();
 		}
 	};
 
-	abstract Set<Integer> recipientsFor(Integer fromUser, Integer toUser, UserRepository userRepository);
+	abstract Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, UserRepository userRepository);
 
 	private static final Map<String, EventType> CACHE_BY_ID = new HashMap<>();
 
