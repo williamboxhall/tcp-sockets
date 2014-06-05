@@ -1,6 +1,7 @@
 package org.example.domain;
 
-import java.util.Arrays;
+import static java.util.Arrays.asList;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -8,8 +9,9 @@ import java.util.Set;
 public class User {
 	private final Set<Integer> followers = new HashSet<>();
 
-	public void addFollower(Integer... follower) {
-		followers.addAll(new HashSet<>(Arrays.asList(follower)));
+	public User addFollower(int follower) {
+		followers.addAll(new HashSet<>(asList(follower)));
+		return this;
 	}
 
 	public void removeFollower(int userId) {

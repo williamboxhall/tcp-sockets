@@ -24,11 +24,11 @@ public class Router implements Consumer<Event> {
 	@Override
 	public void accept(Event event) {
 		for (int recipient : event.updateAndReturnRecipients(userRepository)) {
-			notify(event, recipient);
+			notify(recipient, event);
 		}
 	}
 
-	private void notify(Event event, int recipient) {
+	private void notify(int recipient, Event event) {
 		try {
 			if (registered(recipient)) {
 				send(recipient, event);

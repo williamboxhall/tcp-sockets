@@ -10,8 +10,7 @@ import java.util.Set;
 public enum EventType {
 	FOLLOW("F") {
 		Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, UserRepository userRepository) {
-			User user = userRepository.get(toUser);
-			user.addFollower(fromUser);
+			userRepository.get(toUser).addFollower(fromUser);
 			return singleton(toUser);
 		}
 	},

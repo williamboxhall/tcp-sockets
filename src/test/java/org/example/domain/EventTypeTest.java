@@ -29,7 +29,7 @@ public class EventTypeTest {
 		userRepository.get(GEORGE);
 		userRepository.get(RINGO);
 		userRepository.get(PAUL);
-		userRepository.get(JOHN).addFollower(GEORGE, RINGO);
+		userRepository.get(JOHN).addFollower(GEORGE).addFollower(RINGO);
 	}
 
 	@Test
