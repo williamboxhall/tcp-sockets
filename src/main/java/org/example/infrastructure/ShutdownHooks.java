@@ -7,7 +7,7 @@ public class ShutdownHooks {
 	private ShutdownHooks() {
 	}
 
-	public static void ensure(final Thread thread) {
+	public static void ensureOnExit(final Thread thread) {
 		Runtime.getRuntime().addShutdownHook(thread);
 	}
 

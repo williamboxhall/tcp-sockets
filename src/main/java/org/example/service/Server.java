@@ -2,7 +2,7 @@ package org.example.service;
 
 import static org.example.infrastructure.Logger.LOG;
 import static org.example.infrastructure.ShutdownHooks.closed;
-import static org.example.infrastructure.ShutdownHooks.ensure;
+import static org.example.infrastructure.ShutdownHooks.ensureOnExit;
 import static org.example.infrastructure.Sockets.accept;
 import static org.example.infrastructure.Sockets.integerFrom;
 import static org.example.infrastructure.Sockets.socketServerFor;
@@ -56,7 +56,7 @@ public class Server {
 					InputStream inputStream = eventSource.getInputStream();
 					BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
 
-					ensure(closed(eventSource));
+					ensureOnExit(closed(eventSource));
 
 					while (!stopRequested) {
 						String raw = in.readLine();
@@ -77,7 +77,7 @@ public class Server {
 		return new Thread("clients") {
 			@Override
 			public void run() {
-				ensure(closed(router));
+				ensureOnExit(closed(router));
 				ServerSocket server = socketServerFor(clientPort);
 				while (!stopRequested) {
 					Socket client = accept(server);
