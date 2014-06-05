@@ -40,22 +40,6 @@ public class Sockets {
 		}
 	}
 
-	public static BufferedReader bufferedReaderFor(Socket socket) {
-		try {
-			return new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
-	public static String readLine(BufferedReader bufferedReader) {
-		try {
-			return bufferedReader.readLine();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
-	}
-
 	public static int integerFrom(Socket socket) {
 		try {
 			return Integer.parseInt(bufferedReaderFor(socket).readLine());
@@ -68,6 +52,22 @@ public class Sockets {
 		try {
 			closeable.close();
 		} catch (IOException e) {
+		}
+	}
+
+	private static BufferedReader bufferedReaderFor(Socket socket) {
+		try {
+			return new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
+	private static String readLine(BufferedReader bufferedReader) {
+		try {
+			return bufferedReader.readLine();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
 		}
 	}
 }

@@ -1,12 +1,13 @@
 package org.example.service;
 
 import static java.lang.String.format;
-import static org.example.domain.EventQueue.eventQueueFor;
+import static org.example.domain.EventQueue.sendTo;
 import static org.example.infrastructure.Logger.LOG;
 import static org.example.infrastructure.ShutdownHooks.ensureClosedOnExit;
 import static org.example.infrastructure.Sockets.accept;
 import static org.example.infrastructure.Sockets.integerFrom;
 import static org.example.infrastructure.Sockets.socketServerFor;
+import static org.example.infrastructure.Sockets.untilEmpty;
 
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -42,7 +43,7 @@ public class Server {
 			public void run() {
 				ServerSocket server = socketServerFor(eventSourcePort);
 				while (true) {
-					eventQueueFor(ensureClosedOnExit(accept(server))).forEach(router);
+					untilEmpty(ensureClosedOnExit(accept(server)), sendTo(router));
 				}
 			}
 		};
