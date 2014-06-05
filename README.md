@@ -85,7 +85,7 @@ java -jar target/follower-maze-0.0.1-SNAPSHOT.jar
 
 #### Unit & End-to-end Tests
 
-'mvn clean test'
+`mvn clean test`
 
 ### The Configuration
 
