@@ -28,9 +28,6 @@ public class AppEndToEndTest {
 		firstClient = new Socket("localhost", CLIENT_PORT);
 		write(firstClient, "1");
 		waitForClientToFinishConnection(1);
-		secondClient = new Socket("localhost", CLIENT_PORT);
-		write(secondClient, "2");
-		waitForClientToFinishConnection(2);
 	}
 
 	@AfterClass
@@ -51,7 +48,13 @@ public class AppEndToEndTest {
 
 		assertThat(readLine(firstClient), is("1|F|2|1"));
 		assertThat(readLine(firstClient), is("5|F|3|1"));
-		assertThat(readLine(secondClient), is("4|F|1|2"));
+
+		secondClient = new Socket("localhost", CLIENT_PORT);
+		write(secondClient, "2");
+		waitForClientToFinishConnection(2);
+		write(eventSource, "6|F|7|2");
+
+		assertThat(readLine(secondClient), is("6|F|7|2"));
 	}
 
 	private static String readLine(Socket socket) throws IOException {
