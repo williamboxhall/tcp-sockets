@@ -43,9 +43,8 @@ sent by the *event source* and what they represent:
 |634&#124;S&#124;32         | 634    | Status Update| 32           | -          |
 
 
-Events may generate notifications for *user clients*. **If there is a
-user client ** connected for them, these are the users to be
-informed for different event types:
+Events may generate notifications for *user clients*. **If there is auser client** connected for them, 
+these are the users to be informed for different event types:
 
 * **Follow**: Only the `To User Id` should be notified
 * **Unfollow**: No clients should be notified
