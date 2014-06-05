@@ -17,18 +17,16 @@ import java.util.Map;
 
 import org.example.domain.Event;
 import org.example.domain.UserRepository;
-import org.example.infrastructure.Logger;
 
 public class Server {
 	private final int eventSourcePort;
 	private final int clientPort;
 	private final Router router;
 
-	public Server(int eventSourcePort, int clientPort, boolean debug, Map<Integer, Socket> registry) {
+	public Server(int eventSourcePort, int clientPort, Map<Integer, Socket> registry) {
 		this.eventSourcePort = eventSourcePort;
 		this.clientPort = clientPort;
 		this.router = new Router(new UserRepository(new UserRepository.UserFactory()), registry);
-		Logger.DEBUG = debug;
 	}
 
 	public void start() {
