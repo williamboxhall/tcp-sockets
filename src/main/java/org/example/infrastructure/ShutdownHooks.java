@@ -9,16 +9,13 @@ public class ShutdownHooks {
 	private ShutdownHooks() {
 	}
 
-	public static void ensureOnExit(final Thread thread) {
-		Runtime.getRuntime().addShutdownHook(thread);
-	}
-
-	public static Thread closed(final Closeable closeable) {
-		return new Thread() {
+	public static <T extends Closeable> T ensureClosedOnExit(final T closeable) {
+		Runtime.getRuntime().addShutdownHook(new Thread() {
 			public void run() {
+				LOG.debug("Closing " + closeable.toString());
 				closeQuietly(closeable);
-				LOG.info("closed something");
 			}
-		};
+		});
+		return closeable;
 	}
 }

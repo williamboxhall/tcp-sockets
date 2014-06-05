@@ -2,6 +2,7 @@ package org.example.presentation;
 
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
+import static org.example.infrastructure.Logger.DEBUG;
 
 import java.net.Socket;
 import java.util.Map;
@@ -17,7 +18,7 @@ public class App {
 	public static void main(String... args) {
 		int eventSourcePort = args.length > 0 ? parseInt(args[0]) : EVENT_SOURCE_PORT;
 		int clientPort = args.length > 1 ? parseInt(args[1]) : CLIENT_PORT;
-		boolean debug = args.length > 2 && parseBoolean(args[2]);
+		boolean debug = args.length > 2 ? parseBoolean(args[2]) : DEBUG;
 		new Server(eventSourcePort, clientPort, debug, REGISTRY).start();
 	}
 }

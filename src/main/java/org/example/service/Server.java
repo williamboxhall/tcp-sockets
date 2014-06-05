@@ -1,16 +1,15 @@
 package org.example.service;
 
+import static java.lang.String.format;
 import static org.example.infrastructure.Logger.LOG;
-import static org.example.infrastructure.ShutdownHooks.closed;
-import static org.example.infrastructure.ShutdownHooks.ensureOnExit;
+import static org.example.infrastructure.ShutdownHooks.ensureClosedOnExit;
 import static org.example.infrastructure.Sockets.accept;
+import static org.example.infrastructure.Sockets.bufferedReaderFor;
 import static org.example.infrastructure.Sockets.integerFrom;
 import static org.example.infrastructure.Sockets.socketServerFor;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
@@ -19,7 +18,6 @@ import java.util.Map;
 import org.example.domain.Event;
 import org.example.domain.UserRepository;
 import org.example.infrastructure.Logger;
-import org.example.infrastructure.Sockets;
 
 public class Server {
 	private final int eventSourcePort;
@@ -34,11 +32,14 @@ public class Server {
 	}
 
 	public void start() {
-		clientsThread().start();
-		LOG.info("Client thread started");
-		eventThread().start();
-		LOG.info("Event thread started");
-		LOG.info("Ctrl-C to shut down");
+		start(clientsThread());
+		start(eventThread());
+		LOG.info("Ctrl-C to safely shut down");
+	}
+
+	private void start(Thread thread) {
+		thread.start();
+		LOG.info(format("%s thread started", thread.getName()));
 	}
 
 	private Thread eventThread() {
@@ -47,13 +48,9 @@ public class Server {
 			public void run() {
 				try {
 					Map<Long, Event> eventQueue = new HashMap<>();
-
+					ServerSocket server = socketServerFor(eventSourcePort);
 					while (true) {
-						final Socket eventSource = Sockets.accept(socketServerFor(eventSourcePort));
-						InputStream inputStream = eventSource.getInputStream();
-						BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
-
-						ensureOnExit(closed(eventSource));
+						BufferedReader in = bufferedReaderFor(ensureClosedOnExit(accept(server)));
 						String raw = in.readLine();
 						while (raw != null) {
 							Event event = new Event(raw);
@@ -73,10 +70,9 @@ public class Server {
 		return new Thread("clients") {
 			@Override
 			public void run() {
-				ensureOnExit(closed(router));
 				ServerSocket server = socketServerFor(clientPort);
 				while (true) {
-					Socket client = accept(server);
+					Socket client = ensureClosedOnExit(accept(server));
 					router.connect(integerFrom(client), client);
 				}
 			}

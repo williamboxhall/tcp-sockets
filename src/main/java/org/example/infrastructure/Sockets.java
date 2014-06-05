@@ -31,9 +31,17 @@ public class Sockets {
 		}
 	}
 
+	public static BufferedReader bufferedReaderFor(Socket socket) {
+		try {
+			return new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public static int integerFrom(Socket socket) {
 		try {
-			return Integer.parseInt(new BufferedReader(new InputStreamReader(socket.getInputStream())).readLine());
+			return Integer.parseInt(bufferedReaderFor(socket).readLine());
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}

@@ -72,18 +72,18 @@ events **in the correct order**, regardless of the order in which the
 
 #### Production
 
-`mvn clean compile exec:java -DskipTests -Dexec.mainClass="org.example.presentation.App"`
+```mvn clean compile exec:java -DskipTests -Dexec.mainClass="org.example.presentation.App"```
 
 or from project root
 
-`
+```
 mvn clean package -DskipTests
 java -jar target/follower-maze-0.0.1-SNAPSHOT.jar
-`
+```
 
 #### Unit & End-to-end Tests
 
-`mvn clean test`
+```mvn clean test```
 
 ### The Configuration
 
