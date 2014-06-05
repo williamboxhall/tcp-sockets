@@ -107,7 +107,7 @@ allow the `clients` thread to share client sockets to the `events` thread withou
 ###### Sockets
 
 The looping threads will block on socket IO operations `ServerSocket.accept()` and
-`ServerSocket.getInputStream().read()` instead of the unneeded processing for spinlock-style polling on resources.
+`Socket.getInputStream().read()` instead of the unneeded processing for spinlock-style polling on resources.
 
 #### Code quality
 
