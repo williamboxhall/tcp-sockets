@@ -10,28 +10,24 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import org.junit.AfterClass;
+import org.junit.After;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
 public class AppEndToEndTest {
 	private static final int EVENT_SOURCE_PORT = 1234;
 	private static final int CLIENT_PORT = 5678;
-	private static Socket eventSource;
-	private static Socket firstClient;
-	private static Socket secondClient;
+	private Socket eventSource;
+	private Socket firstClient;
+	private Socket secondClient;
 
 	@BeforeClass
 	public static void startServer() throws IOException {
 		App.main(valueOf(EVENT_SOURCE_PORT), valueOf(CLIENT_PORT), valueOf(true));
-		eventSource = new Socket("localhost", EVENT_SOURCE_PORT);
-		firstClient = new Socket("localhost", CLIENT_PORT);
-		write(firstClient, "1");
-		waitForClientToFinishConnection(1);
 	}
 
-	@AfterClass
-	public static void stopServer() throws IOException {
+	@After
+	public void stopServer() throws IOException {
 		eventSource.close();
 		firstClient.close();
 		secondClient.close();
@@ -40,12 +36,17 @@ public class AppEndToEndTest {
 
 	@Test // TODO attempt disconnect reconnect stuff with reuse port
 	public void clientReceivesOnlyRelevantEventsInSequentialOrder() throws IOException, InterruptedException {
+		eventSource = new Socket("localhost", EVENT_SOURCE_PORT);
+
+		firstClient = new Socket("localhost", CLIENT_PORT);
+		write(firstClient, "1");
+		waitForClientToFinishConnection(1);
+
 		write(eventSource, "5|F|3|1");
 		write(eventSource, "2|F|4|5");
 		write(eventSource, "3|F|3|4");
 		write(eventSource, "4|F|1|2");
 		write(eventSource, "1|F|2|1");
-
 		assertThat(readLine(firstClient), is("1|F|2|1"));
 		assertThat(readLine(firstClient), is("5|F|3|1"));
 
