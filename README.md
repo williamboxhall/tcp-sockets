@@ -132,3 +132,5 @@ It also follows the Domain Driven Design principles, split in to four 1-way depe
 3. **Domain** is where all the domain concepts and rich behaviour/rules live. Here you will find the business rules for
 deciding which `User`s should receive which `Event`s according to their `EventType` and content
 4. **Infrastructure** is just generic stuff you could find in any project
+
+The code is also pretty lean, avoiding bringing in unnecessary abstractions, generification or class explosion
