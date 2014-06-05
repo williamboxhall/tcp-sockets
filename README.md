@@ -100,7 +100,7 @@ https://travis-ci.org/williamboxhall/follower-maze/builds
 
 An unlimited amount of events may arrive out of order. In order to handle this efficiently, a hash table (`HashMap`) is
 used in combination with tracking the next required sequence number. A backlog of events will be kept until
-the next in sequence arrives and the backlog can be drained. The hash table ensures constant-time (O(1)) stores &
+the next in sequence arrives and the backlog can be drained. The hash table ensures constant-time (*O(1)*) stores &
 lookups, and removes the overhead of sorting or searching in the backlog.
 
 ###### Threads
@@ -117,13 +117,22 @@ The looping threads will block on socket IO operations `ServerSocket.accept()` a
 
 #### Code quality
 
-The code was written closely following the Clean Code (Uncle Bob) / Effective Java (Josh Bloch) idioms.
+The code was written closely following the
+[Clean Code](http://www.barnesandnoble.com/w/clean-code-robert-c-martin/1101628669?ean=9780132350884&itm=1&usri=9780132350884)
+([Uncle Bob](https://twitter.com/unclebobmartin)) /
+[Effective Java](http://www.barnesandnoble.com/w/effective-java-joshua-bloch/1100507678?ean=9780321356680)
+([Josh Bloch](https://twitter.com/joshbloch)) idioms.
 
-It also borrows some functional idioms from functional programming languages as well as the Guava framework for java.
-See `Consumer.java` to match `java.util.function.Consumer` coming in Java 8 as part of `JSR-335`. These idioms allow
+It also borrows some functional idioms from functional programming languages as well as the
+[Guava framework](https://code.google.com/p/guava-libraries/wiki/FunctionalExplained) for java.
+See `Consumer.java` to match
+`[java.util.function.Consumer](http://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html)`
+coming in Java 8 as part of `[JSR-335](http://cr.openjdk.java.net/~dlsmith/jsr335-0.6.1/)`. These idioms allow
 much greater decoupling and composeability.
 
-It also follows the Domain Driven Design principles, split in to four 1-way dependency tiers:
+It also follows the
+[Domain Driven Design](http://books.google.com/books/about/Domain_Driven_Design.html?id=hHBf4YxMnWMC&redir_esc=y)
+([Eric Evans](https://twitter.com/ericevans0)) principles, split in to four 1-way dependency tiers:
 `Presentation->Service->Domain->Infrastructure`.
 
 1. **Presentation** is just app-entry (`public static void main(String[] args)`) and command-line handling
