@@ -25,13 +25,16 @@ public class EventSequencer implements Consumer<String> {
 	@Override
 	public void accept(String raw) {
 		try {
-			Event event = new Event(raw);
-			backlog.put(event.sequenceNumber(), event);
-			while (backlog.containsKey(next)) {
-				consumer.accept(backlog.remove(next++));
-			}
+			sequence(new Event(raw));
 		} catch (IllegalArgumentException e) {
 			LOG.error(format("Dropping malformed event '%s'", raw));
+		}
+	}
+
+	private void sequence(Event event) {
+		backlog.put(event.sequenceNumber(), event);
+		while (backlog.containsKey(next)) {
+			consumer.accept(backlog.remove(next++));
 		}
 	}
 }
