@@ -31,7 +31,7 @@ public class Router implements Consumer<Event> {
 	private void notify(Event event, int recipient) {
 		try {
 			if (registered(recipient)) {
-				send(event, recipient);
+				send(recipient, event);
 				return;
 			}
 		} catch (IOException e) {
@@ -44,7 +44,7 @@ public class Router implements Consumer<Event> {
 		return registry.containsKey(recipient);
 	}
 
-	private void send(Event event, int recipient) throws IOException {
+	private void send(int recipient, Event event) throws IOException {
 		println(event.raw(), registry.get(recipient));
 		LOG.debug(format("Sent event %s to user %s", event, recipient));
 	}
