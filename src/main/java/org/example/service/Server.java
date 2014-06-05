@@ -1,7 +1,7 @@
 package org.example.service;
 
 import static java.lang.String.format;
-import static org.example.domain.EventQueue.sendTo;
+import static org.example.domain.EventSequencer.sendTo;
 import static org.example.infrastructure.Logger.LOG;
 import static org.example.infrastructure.ShutdownHooks.ensureClosedOnExit;
 import static org.example.infrastructure.Sockets.accept;
