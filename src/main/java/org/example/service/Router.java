@@ -2,9 +2,9 @@ package org.example.service;
 
 import static java.lang.String.format;
 import static org.example.infrastructure.Logger.LOG;
+import static org.example.infrastructure.Sockets.println;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.Map;
 
@@ -30,26 +30,32 @@ public class Router implements Consumer<Event> {
 
 	private void notify(Event event, int recipient) {
 		try {
-			Socket socket = registry.get(recipient);
-			if (socket != null) {
-				new PrintWriter(socket.getOutputStream(), true).println(event.raw());
-				LOG.debug(format("Sent event %s to user %s", event, recipient));
-			} else {
-				LOG.debug(format("Dropped event %s to user %s", event, recipient));
+			if (registered(recipient)) {
+				send(event, recipient);
+				return;
 			}
 		} catch (IOException e) {
-			LOG.info(format("User %s disconnected", recipient));
 			disconnect(recipient);
-			LOG.debug(format("Dropped event %s to user %s", event, recipient));
 		}
+		LOG.debug(format("Dropped event %s to user %s", event, recipient));
 	}
 
-	public void connect(int userId, Socket socket) {
-		registry.put(userId, socket);
-		LOG.info(format("User %s connected", userId));
+	private boolean registered(int recipient) {
+		return registry.containsKey(recipient);
 	}
 
-	private void disconnect(int userId) {
-		registry.remove(userId);
+	private void send(Event event, int recipient) throws IOException {
+		println(event.raw(), registry.get(recipient));
+		LOG.debug(format("Sent event %s to user %s", event, recipient));
+	}
+
+	public void connect(int user, Socket socket) {
+		registry.put(user, socket);
+		LOG.info(format("User %s connected", user));
+	}
+
+	private void disconnect(int user) {
+		registry.remove(user);
+		LOG.info(format("User %s disconnected", user));
 	}
 }
