@@ -114,3 +114,21 @@ allow the `clients` thread to share client sockets to the `events` thread withou
 
 The looping threads will block on socket IO operations `ServerSocket.accept()` and
 `ServerSocket.getInputStream().read()` instead of the unneeded processing for spinlock-style polling on resources.
+
+##### Code quality
+
+The code was written closely following the Clean Code (Uncle Bob) / Effective Java (Josh Bloch) idioms.
+
+It also borrows some functional idioms from functional programming languages as well as the Guava framework for java.
+See `Consumer.java` to match `java.util.function.Consumer` coming in Java 8 as part of `JSR-335`. These idioms allow
+much greater decoupling and composeability.
+
+It also follows the Domain Driven Design principles, split in to four 1-way dependency tiers:
+`Presentation->Service->Domain->Infrastructure`.
+
+1. **Presentation** is just app-entry (`public static void main(String[] args)`) and command-line handling
+2. **Service** is an orchestration tier orchestrating rich domain objects and handling transport-layer concerns
+(working with sockets)
+3. **Domain** is where all the domain concepts and rich behaviour/rules live. Here you will find the business rules for
+deciding which `User`s should receive which `Event`s according to their `EventType` and content
+4. **Infrastructure** is just generic stuff you could find in any project
