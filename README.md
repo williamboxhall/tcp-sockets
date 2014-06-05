@@ -118,7 +118,7 @@ The code was written closely following the
 ([Josh Bloch](https://twitter.com/joshbloch)) idioms.
 
 It also borrows some functional idioms from functional programming languages as well as the
-[Guava framework](https://code.google.com/p/guava-libraries/wiki/FunctionalExplained) for java.
+[Guava framework](https://code.google.com/p/guava-libraries/wiki/FunctionalExplained) for Java.
 See 
 [`Consumer.java`](https://github.com/williamboxhall/follower-maze/blob/master/src/main/java/org/example/infrastructure/Consumer.java) 
 to match
