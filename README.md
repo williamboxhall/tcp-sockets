@@ -135,8 +135,8 @@ It also follows the
 `Presentation->Service->Domain->Infrastructure`.
 
 1. **Presentation** is just app-entry (`public static void main(String[] args)`) and command-line handling
-2. **Service** is an orchestration tier orchestrating rich domain objects and handling transport-layer concerns
-(working with sockets)
+2. **Service** is an orchestration tier for kicking off threads, orchestrating rich domain objects and handling
+transport-layer concerns (working with sockets)
 3. **Domain** is where all the domain concepts and rich behaviour/rules live. Here you will find the business rules for
 deciding which `User`s should receive which `Event`s according to their `EventType` and content
 4. **Infrastructure** is just generic stuff you could find in any project
