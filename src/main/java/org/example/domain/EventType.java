@@ -60,6 +60,11 @@ public enum EventType {
 	}
 
 	static EventType byId(String id) {
-		return CACHE_BY_ID.get(id);
+		EventType eventType = CACHE_BY_ID.get(id);
+		if (eventType == null) {
+			throw new IllegalArgumentException();
+		}
+		return eventType;
 	}
+
 }
