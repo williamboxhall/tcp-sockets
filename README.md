@@ -124,7 +124,9 @@ The code was written closely following the
 
 It also borrows some functional idioms from functional programming languages as well as the
 [Guava framework](https://code.google.com/p/guava-libraries/wiki/FunctionalExplained) for java.
-See `Consumer.java` to match
+See 
+[`Consumer.java`](https://github.com/williamboxhall/follower-maze/blob/master/src/main/java/org/example/infrastructure/Consumer.java) 
+to match
 [`java.util.function.Consumer`](http://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html)
 coming in Java 8 as part of [`JSR-335`](http://cr.openjdk.java.net/~dlsmith/jsr335-0.6.1/). These idioms allow
 much greater decoupling and composeability.
@@ -132,14 +134,18 @@ much greater decoupling and composeability.
 It also follows the
 [Domain Driven Design](http://books.google.com/books/about/Domain_Driven_Design.html?id=hHBf4YxMnWMC&redir_esc=y)
 ([Eric Evans](https://twitter.com/ericevans0)) principles, split in to four 1-way dependency tiers:
-`Presentation->Service->Domain->Infrastructure`.
+`Presentation -> Service -> Domain -> Infrastructure`.
 
-1. **Presentation** is just app-entry (`public static void main(String[] args)`) and command-line handling
-2. **Service** is an orchestration tier for kicking off threads, orchestrating rich domain objects and handling
+1. [**Presentation**](https://github.com/williamboxhall/follower-maze/tree/master/src/main/java/org/example/presentation)
+is just app-entry (`public static void main(String[] args)`) and command-line handling
+2. [**Service**](https://github.com/williamboxhall/follower-maze/tree/master/src/main/java/org/example/service)
+is an orchestration tier for kicking off threads, orchestrating rich domain objects and handling
 transport-layer concerns (working with sockets)
-3. **Domain** is where all the domain concepts and rich behaviour/rules live. Here you will find the business rules for
+3. [**Domain**](https://github.com/williamboxhall/follower-maze/tree/master/src/main/java/org/example/domain) 
+is where all the domain concepts and rich behaviour/rules live. Here you will find the business rules for
 deciding which `User`s should receive which `Event`s according to their `EventType` and content
-4. **Infrastructure** is just generic stuff you could find in any project
+4. [**Infrastructure**](https://github.com/williamboxhall/follower-maze/tree/master/src/main/java/org/example/infrastructure) 
+is just generic stuff you could find in any project
 
 The code is also very lean, avoiding bringing in unnecessary abstractions, generification or class explosion. The
 tests are made elegant and expressive using a combination of [Mockito](https://code.google.com/p/mockito/) mocks and [Hamcrest](https://code.google.com/p/hamcrest/wiki/Tutorial) matchers
