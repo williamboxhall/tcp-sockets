@@ -89,8 +89,7 @@ example usage: java -jar app.jar 1234 5678 true
 ```mvn clean test```
 
 All classes fully unit tested except for the threaded entry-point which is covered by an end-to-end integration test
-`AppEndToEndTest.java`. Every commit is built by a CI build on TravisCI:
-https://travis-ci.org/williamboxhall/follower-maze/builds
+`AppEndToEndTest.java`. Every commit is built by a Continuous Integration build on [Travis](https://travis-ci.org/williamboxhall/follower-maze/builds)
 
 ### Considerations
 
@@ -126,8 +125,8 @@ The code was written closely following the
 It also borrows some functional idioms from functional programming languages as well as the
 [Guava framework](https://code.google.com/p/guava-libraries/wiki/FunctionalExplained) for java.
 See `Consumer.java` to match
-`[java.util.function.Consumer](http://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html)`
-coming in Java 8 as part of `[JSR-335](http://cr.openjdk.java.net/~dlsmith/jsr335-0.6.1/)`. These idioms allow
+[`java.util.function.Consumer`](http://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html)
+coming in Java 8 as part of [`JSR-335`](http://cr.openjdk.java.net/~dlsmith/jsr335-0.6.1/). These idioms allow
 much greater decoupling and composeability.
 
 It also follows the
@@ -142,4 +141,5 @@ It also follows the
 deciding which `User`s should receive which `Event`s according to their `EventType` and content
 4. **Infrastructure** is just generic stuff you could find in any project
 
-The code is also pretty lean, avoiding bringing in unnecessary abstractions, generification or class explosion
+The code is also very lean, avoiding bringing in unnecessary abstractions, generification or class explosion. The
+tests are made elegant and expressive using a combination of [Mockito](https://code.google.com/p/mockito/) mocks and [Hamcrest](https://code.google.com/p/hamcrest/wiki/Tutorial) matchers
