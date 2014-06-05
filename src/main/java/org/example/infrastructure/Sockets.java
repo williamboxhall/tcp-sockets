@@ -1,6 +1,7 @@
 package org.example.infrastructure;
 
 import java.io.BufferedReader;
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.ServerSocket;
@@ -34,9 +35,9 @@ public class Sockets {
 		}
 	}
 
-	public static void closeQuietly(Socket socket) {
+	public static void closeQuietly(Closeable closeable) {
 		try {
-			socket.close();
+			closeable.close();
 		} catch (IOException e) {
 		}
 	}

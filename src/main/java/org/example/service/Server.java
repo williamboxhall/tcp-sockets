@@ -25,7 +25,6 @@ public class Server {
 	private final int eventSourcePort;
 	private final int clientPort;
 	private final Router router;
-	private volatile boolean stopRequested = false;
 
 	public Server(int eventSourcePort, int clientPort, boolean debug, Map<Integer, Socket> registry) {
 		this.eventSourcePort = eventSourcePort;
@@ -58,7 +57,7 @@ public class Server {
 
 					ensureOnExit(closed(eventSource));
 
-					while (!stopRequested) {
+					while (true) {
 						String raw = in.readLine();
 						if (raw != null) {
 							Event event = new Event(raw);
@@ -79,7 +78,7 @@ public class Server {
 			public void run() {
 				ensureOnExit(closed(router));
 				ServerSocket server = socketServerFor(clientPort);
-				while (!stopRequested) {
+				while (true) {
 					Socket client = accept(server);
 					router.connect(integerFrom(client), client);
 				}
