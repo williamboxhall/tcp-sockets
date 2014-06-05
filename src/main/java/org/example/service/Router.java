@@ -13,12 +13,12 @@ import java.util.Map;
 import org.example.domain.Event;
 import org.example.domain.UserRepository;
 
-public class Dispatcher implements Closeable {
+public class Router implements Closeable {
 	private final UserRepository userRepository;
 	private final Map<Integer, Socket> registry;
 	private long nextToDispatch = 1;
 
-	public Dispatcher(UserRepository userRepository, Map<Integer, Socket> registry) {
+	public Router(UserRepository userRepository, Map<Integer, Socket> registry) {
 		this.userRepository = userRepository;
 		this.registry = registry;
 	}

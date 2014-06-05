@@ -24,13 +24,13 @@ import org.example.infrastructure.Sockets;
 public class Server {
 	private final int eventSourcePort;
 	private final int clientPort;
-	private final Dispatcher dispatcher;
+	private final Router router;
 	private volatile boolean stopRequested = false;
 
 	public Server(int eventSourcePort, int clientPort, boolean debug, Map<Integer, Socket> registry) {
 		this.eventSourcePort = eventSourcePort;
 		this.clientPort = clientPort;
-		this.dispatcher = new Dispatcher(new UserRepository(new UserRepository.UserFactory()), registry);
+		this.router = new Router(new UserRepository(new UserRepository.UserFactory()), registry);
 		Logger.DEBUG = debug;
 	}
 
@@ -64,7 +64,7 @@ public class Server {
 							Event event = new Event(raw);
 							eventQueue.put(event.sequenceNumber(), event);
 						}
-						dispatcher.drainQueuedEventsInOrder(eventQueue);
+						router.drainQueuedEventsInOrder(eventQueue);
 					}
 				} catch (IOException e) {
 					throw new RuntimeException(e);
@@ -77,11 +77,11 @@ public class Server {
 		return new Thread("clients") {
 			@Override
 			public void run() {
-				ensure(closed(dispatcher));
+				ensure(closed(router));
 				ServerSocket server = socketServerFor(clientPort);
 				while (!stopRequested) {
 					Socket client = accept(server);
-					dispatcher.connect(integerFrom(client), client);
+					router.connect(integerFrom(client), client);
 				}
 			}
 		};
