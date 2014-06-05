@@ -86,7 +86,7 @@ All classes fully unit tested except for the threaded entry-point which is cover
 Every commit is built by a Continuous Integration build on 
 [Travis](https://travis-ci.org/williamboxhall/follower-maze/builds)
 
-### Considerations
+### Design Considerations
 
 #### Performance
 
