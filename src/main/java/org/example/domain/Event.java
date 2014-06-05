@@ -1,5 +1,7 @@
 package org.example.domain;
 
+import static org.example.domain.EventType.checkNotNull;
+
 public class Event {
 	private final String raw;
 	private final long sequenceNumber;
@@ -8,7 +10,7 @@ public class Event {
 	private final Integer toUserId;
 
 	public Event(String raw) {
-		this.raw = raw;
+		this.raw = checkNotNull(raw);
 		String[] parts = raw.split("\\|");
 		this.sequenceNumber = Long.parseLong(parts[0]);
 		this.type = EventType.byId(parts[1]);

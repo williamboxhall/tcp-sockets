@@ -60,11 +60,13 @@ public enum EventType {
 	}
 
 	static EventType byId(String id) {
-		EventType eventType = CACHE_BY_ID.get(id);
-		if (eventType == null) {
-			throw new IllegalArgumentException();
-		}
-		return eventType;
+		return checkNotNull(CACHE_BY_ID.get(id));
 	}
 
+	public static <T> T checkNotNull(T arg) {
+		if (arg == null) {
+			throw new IllegalArgumentException();
+		}
+		return arg;
+	}
 }

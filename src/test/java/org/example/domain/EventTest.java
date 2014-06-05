@@ -37,8 +37,8 @@ public class EventTest {
 		}
 	}
 
-	@Test(expected = NullPointerException.class)
-	public void NullPointerExceptionForNullString() {
+	@Test(expected = IllegalArgumentException.class)
+	public void IllegalArgumentExceptionForNullString() {
 		new Event(null);
 	}
 
