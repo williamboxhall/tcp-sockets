@@ -42,15 +42,9 @@ sent by the *event source* and what they represent:
 |43&#124;P&#124;32&#124;56  | 43     | Private Msg  | 32           | 56         |
 |634&#124;S&#124;32         | 634    | Status Update| 32           | -          |
 
-Using the verification program supplied, you will receive exactly 10000000 events,
-with sequence number from 1 to 10000000. **The events will arrive out of order**.
-
-*Note: Please do not assume that your code would only handle a finite sequence
-of events, **we expect your server to handle an arbitrarily large events stream**
-(i.e. you would not be able to keep all events in memory or any other storage)*
 
 Events may generate notifications for *user clients*. **If there is a
-*user client* ** connected for them, these are the users to be
+user client ** connected for them, these are the users to be
 informed for different event types:
 
 * **Follow**: Only the `To User Id` should be notified
