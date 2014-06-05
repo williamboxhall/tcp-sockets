@@ -38,7 +38,7 @@ public class RouterTest {
 	@Mock
 	private OutputStream secondOut;
 
-	Router router;
+	private Router router;
 
 	@Before
 	public void setUp() throws IOException {
