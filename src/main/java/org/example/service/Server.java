@@ -1,21 +1,17 @@
 package org.example.service;
 
 import static java.lang.String.format;
+import static org.example.domain.EventQueue.eventQueueFor;
 import static org.example.infrastructure.Logger.LOG;
 import static org.example.infrastructure.ShutdownHooks.ensureClosedOnExit;
 import static org.example.infrastructure.Sockets.accept;
-import static org.example.infrastructure.Sockets.bufferedReaderFor;
 import static org.example.infrastructure.Sockets.integerFrom;
 import static org.example.infrastructure.Sockets.socketServerFor;
 
-import java.io.BufferedReader;
-import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.HashMap;
 import java.util.Map;
 
-import org.example.domain.Event;
 import org.example.domain.UserRepository;
 
 public class Server {
@@ -44,21 +40,9 @@ public class Server {
 		return new Thread("events") {
 			@Override
 			public void run() {
-				try {
-					Map<Long, Event> eventQueue = new HashMap<>();
-					ServerSocket server = socketServerFor(eventSourcePort);
-					while (true) {
-						BufferedReader in = bufferedReaderFor(ensureClosedOnExit(accept(server)));
-						String raw = in.readLine();
-						while (raw != null) {
-							Event event = new Event(raw);
-							eventQueue.put(event.sequenceNumber(), event);
-							router.drainQueuedEventsInOrder(eventQueue);
-							raw = in.readLine();
-						}
-					}
-				} catch (IOException e) {
-					throw new RuntimeException(e);
+				ServerSocket server = socketServerFor(eventSourcePort);
+				while (true) {
+					router.drainInOrder(eventQueueFor(ensureClosedOnExit(accept(server))));
 				}
 			}
 		};

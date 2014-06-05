@@ -39,6 +39,14 @@ public class Sockets {
 		}
 	}
 
+	public static String readLine(BufferedReader bufferedReader) {
+		try {
+			return bufferedReader.readLine();
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
 	public static int integerFrom(Socket socket) {
 		try {
 			return Integer.parseInt(bufferedReaderFor(socket).readLine());
