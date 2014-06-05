@@ -42,7 +42,7 @@ public class Server {
 			public void run() {
 				ServerSocket server = socketServerFor(eventSourcePort);
 				while (true) {
-					router.drainInOrder(eventQueueFor(ensureClosedOnExit(accept(server))));
+					eventQueueFor(ensureClosedOnExit(accept(server))).forEach(router);
 				}
 			}
 		};
