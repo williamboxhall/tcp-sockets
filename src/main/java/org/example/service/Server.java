@@ -56,15 +56,14 @@ public class Server {
 					BufferedReader in = new BufferedReader(new InputStreamReader(inputStream));
 
 					ensureOnExit(closed(eventSource));
-
-					while (true) {
-						String raw = in.readLine();
-						if (raw != null) {
-							Event event = new Event(raw);
-							eventQueue.put(event.sequenceNumber(), event);
-						}
+					String raw = in.readLine();
+					while (raw != null) {
+						Event event = new Event(raw);
+						eventQueue.put(event.sequenceNumber(), event);
 						router.drainQueuedEventsInOrder(eventQueue);
+						raw = in.readLine();
 					}
+					LOG.info("No more events, stopping event source thread");
 				} catch (IOException e) {
 					throw new RuntimeException(e);
 				}
