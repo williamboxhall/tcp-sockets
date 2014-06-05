@@ -6,6 +6,9 @@ public class Logger {
 	public static final Logger LOG = new Logger();
 	public static boolean DEBUG = true;
 
+	private Logger() {
+	}
+
 	public void error(String message) {
 		println(message, "ERROR");
 	}
