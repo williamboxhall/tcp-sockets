@@ -104,6 +104,12 @@ arriving. Splitting these in to two threads, `clients` and `events`, can stop th
 each other and allow the simultaneous use of two cores in multi-core CPUs. The threads use a `ConcurrentHashMap` to
 allow the `clients` thread to share client sockets to the `events` thread without breaking thread-safety.
 
+Unit-testing threads (and sockets) is difficult due to timing of thread execution/socket connection being
+non-deterministic.
+[`AppEndToEndTest.java`](https://github.com/williamboxhall/follower-maze/blob/master/src/test/java/org/example/presentation/AppEndToEndTest.java)
+deals with this by getting a handle of the shared `ConcurrentHashMap` acotes cessed by both threads and polls until it
+reaches the desired state before moving on. This guarantees deterministic execution and a reliable test.
+
 ###### Sockets
 
 The looping threads will block on socket IO operations `ServerSocket.accept()` and
