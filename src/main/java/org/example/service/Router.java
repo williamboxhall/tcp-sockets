@@ -2,7 +2,7 @@ package org.example.service;
 
 import static java.lang.String.format;
 import static org.example.infrastructure.Logger.LOG;
-import static org.example.infrastructure.Sockets.println;
+import static org.example.infrastructure.Sockets.writeLine;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -45,7 +45,7 @@ public class Router implements Consumer<Event> {
 	}
 
 	private void send(int recipient, Event event) throws IOException {
-		println(event.raw(), registry.get(recipient));
+		writeLine(event.raw(), registry.get(recipient));
 		LOG.debug(format("Sent event %s to user %s", event, recipient));
 	}
 

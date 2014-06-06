@@ -3,6 +3,7 @@ package org.example.presentation;
 import static java.lang.Boolean.parseBoolean;
 import static java.lang.Integer.parseInt;
 import static java.lang.String.format;
+import static java.util.Arrays.asList;
 import static org.example.infrastructure.Logger.DEBUG;
 
 import java.net.Socket;
@@ -24,8 +25,8 @@ public class App {
 			Logger.DEBUG = args.length > 2 ? parseBoolean(args[2]) : DEBUG;
 			new Server(eventSourcePort, clientPort, REGISTRY).start();
 		} catch (NumberFormatException e) {
-			System.out.println(format("Invalid argument: %s", args));
-			System.out.println("arg usage: ... [event source port (default 9090)] [client port (default 9099)] [debug enabled (default false)]");
+			System.out.println(format("Invalid arguments: %s", asList(args)));
+			System.out.println("arg usage: ... [event source port (default 9090)] [client port (default 9099)] [debug logging enabled (default false)]");
 			System.out.println("example usage: java -jar app.jar 1234 5678 true");
 		}
 	}

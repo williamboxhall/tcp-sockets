@@ -18,7 +18,7 @@ public class User {
 		followers.remove(userId);
 	}
 
-	public Set<Integer> getFollowers() {
+	public Set<Integer> followers() {
 		return new HashSet<>(followers);
 	}
 }

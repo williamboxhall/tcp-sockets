@@ -34,16 +34,16 @@ public class EventTypeTest {
 
 	@Test
 	public void followNotifiesAndAddsFollowerToUser() {
-		assertThat(userRepository.get(JOHN).getFollowers(), not(hasItems(PAUL)));
+		assertThat(userRepository.get(JOHN).followers(), not(hasItems(PAUL)));
 		assertThat(FOLLOW.updateAndReturnRecipients(PAUL, JOHN, userRepository), is(containsInAnyOrder(JOHN)));
-		assertThat(userRepository.get(JOHN).getFollowers(), hasItems(PAUL));
+		assertThat(userRepository.get(JOHN).followers(), hasItems(PAUL));
 	}
 
 	@Test
 	public void unfollowRemovesFollowerAndNotifiesNobody() {
-		assertThat(userRepository.get(JOHN).getFollowers(), hasItems(GEORGE));
+		assertThat(userRepository.get(JOHN).followers(), hasItems(GEORGE));
 		assertThat(UNFOLLOW.updateAndReturnRecipients(GEORGE, JOHN, userRepository), is(empty()));
-		assertThat(userRepository.get(JOHN).getFollowers(), not(hasItems(GEORGE)));
+		assertThat(userRepository.get(JOHN).followers(), not(hasItems(GEORGE)));
 	}
 
 	@Test

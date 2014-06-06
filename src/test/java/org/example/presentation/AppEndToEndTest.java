@@ -35,7 +35,7 @@ public class AppEndToEndTest {
 	}
 
 	@Test
-	public void clientReceivesOnlyRelevantEventsInSequentialOrder() throws IOException, InterruptedException {
+	public void clientReceivesOnlyRelevantEventsInSequentialOrder() throws IOException {
 		eventSource = new Socket("localhost", EVENT_SOURCE_PORT);
 
 		firstClient = new Socket("localhost", CLIENT_PORT);
@@ -63,7 +63,8 @@ public class AppEndToEndTest {
 		return reader.readLine();
 	}
 
-	private static void waitForClientToFinishConnection(int id) throws IOException {
+	@SuppressWarnings("StatementWithEmptyBody")
+	private static void waitForClientToFinishConnection(int id) {
 		while (!App.REGISTRY.containsKey(id)) {
 		}
 	}

@@ -37,7 +37,7 @@ public enum EventType {
 	STATUS_UPDATE("S") {
 		@Override
 		Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, UserRepository userRepository) {
-			return userRepository.get(fromUser).getFollowers();
+			return userRepository.get(fromUser).followers();
 		}
 	};
 

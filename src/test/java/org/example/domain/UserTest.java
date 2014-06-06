@@ -16,8 +16,8 @@ public class UserTest {
 	public void shouldExposeFollowers() {
 		User user = new User();
 		user.addFollower(USER_ID);
-		assertThat(user.getFollowers(), contains(USER_ID));
+		assertThat(user.followers(), contains(USER_ID));
 		user.removeFollower(USER_ID);
-		assertThat(user.getFollowers(), not(contains(USER_ID)));
+		assertThat(user.followers(), not(contains(USER_ID)));
 	}
 }

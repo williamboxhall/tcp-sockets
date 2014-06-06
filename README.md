@@ -79,7 +79,7 @@ java -jar bin/follower-maze.jar
 configuration
 
 ```
-arg usage: ... [event source port (default 9090)] [client port (default 9099)] [debug enabled (default false)]
+arg usage: ... [event source port (default 9090)] [client port (default 9099)] [debug logging enabled (default false)]
 example usage: java -jar app.jar 1234 5678 true
 ```
 

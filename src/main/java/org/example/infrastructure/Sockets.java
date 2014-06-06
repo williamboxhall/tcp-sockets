@@ -42,17 +42,14 @@ public class Sockets {
 	}
 
 	public static int integerFrom(Socket socket) {
-		try {
-			return Integer.parseInt(bufferedReaderFor(socket).readLine());
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		return Integer.parseInt(readLine(bufferedReaderFor(socket)));
 	}
 
-	public static void println(String string, Socket socket) throws IOException {
+	public static void writeLine(String string, Socket socket) throws IOException {
 		new PrintWriter(socket.getOutputStream(), true).println(string);
 	}
 
+	@SuppressWarnings("EmptyCatchBlock")
 	public static void closeQuietly(Closeable closeable) {
 		try {
 			closeable.close();

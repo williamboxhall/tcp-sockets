@@ -40,6 +40,7 @@ public class Server {
 	private Thread eventThread() {
 		return new Thread("events") {
 			@Override
+			@SuppressWarnings("InfiniteLoopStatement")
 			public void run() {
 				ServerSocket server = serverFor(eventSourcePort);
 				while (true) {
@@ -52,6 +53,7 @@ public class Server {
 	private Thread clientsThread() {
 		return new Thread("clients") {
 			@Override
+			@SuppressWarnings("InfiniteLoopStatement")
 			public void run() {
 				ServerSocket server = serverFor(clientPort);
 				while (true) {
