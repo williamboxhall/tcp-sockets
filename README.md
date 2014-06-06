@@ -125,7 +125,7 @@ The looping threads will block on socket IO operations `ServerSocket.accept()` a
 
 Multi-user applications such as this (or such as Twitter) have many orders of magnitude more events than they have
 users. With this in mind, users are identified using 32bit `Integer`s while events are identified with 64bit `Long`s.
-Ths aligns with Twitter's model which at the time of writing has a largest tweet id of
+This aligns with Twitter's model which at the time of writing has a largest tweet id of
 [474263576501174273](https://twitter.com/seriouspony/status/474263576501174273) which fits comfortably in 64bits but
 has outgrown 32bits.
 
