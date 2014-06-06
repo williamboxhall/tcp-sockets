@@ -107,7 +107,7 @@ allow the `clients` thread to share client sockets to the `events` thread withou
 Unit-testing threads (and sockets) is difficult due to timing of thread execution/socket connection being
 non-deterministic.
 [`AppEndToEndTest.java`](https://github.com/williamboxhall/follower-maze/blob/master/src/test/java/org/example/presentation/AppEndToEndTest.java)
-deals with this by getting a handle of the shared `ConcurrentHashMap` acotes cessed by both threads and polls until it
+deals with this by getting a handle of the shared `ConcurrentHashMap` accessed by both threads and polls until it
 reaches the desired state before moving on. This guarantees deterministic execution and a reliable test.
 
 ###### Sockets
