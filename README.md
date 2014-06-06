@@ -70,6 +70,12 @@ mvn clean package -DskipTests
 java -jar target/follower-maze-0.0.1-SNAPSHOT.jar
 ```
 
+or the pre-built binary, from project root
+
+```
+java -jar bin/follower-maze.jar
+```
+
 configuration
 
 ```
