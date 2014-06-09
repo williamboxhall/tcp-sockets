@@ -23,7 +23,7 @@ public class Router implements Consumer<Event> {
 
 	@Override
 	public void accept(Event event) {
-		for (int recipient : event.updateAndReturnRecipients(userRepository)) {
+		for (int recipient : event.updateAndReturnRecipients(registry.keySet(), userRepository)) {
 			notify(recipient, event);
 		}
 	}

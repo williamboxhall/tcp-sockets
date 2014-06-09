@@ -49,7 +49,7 @@ public class RouterTest {
 
 	@Test
 	public void notifiesConnectedRecipientsOfEvent() throws IOException {
-		when(event.updateAndReturnRecipients(userRepository)).thenReturn(new HashSet<>(asList(1, 2)));
+		when(event.updateAndReturnRecipients(new HashSet<>(asList(1)), userRepository)).thenReturn(new HashSet<>(asList(1, 2)));
 
 		router.connect(1, first);
 		router.accept(event);
@@ -60,7 +60,8 @@ public class RouterTest {
 
 	@Test
 	public void disconnectsRecipientAfterIOException() throws IOException {
-		when(event.updateAndReturnRecipients(userRepository)).thenReturn(new HashSet<>(asList(1, 2)));
+		when(event.updateAndReturnRecipients(new HashSet<>(asList(1, 2)), userRepository)).thenReturn(new HashSet<>(asList(1, 2)));
+		when(event.updateAndReturnRecipients(new HashSet<>(asList(2)), userRepository)).thenReturn(new HashSet<>(asList(1, 2)));
 		when(first.getOutputStream()).thenThrow(new IOException("expected"));
 
 		router.connect(1, first);

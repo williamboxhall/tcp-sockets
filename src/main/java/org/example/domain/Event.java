@@ -33,7 +33,7 @@ public class Event {
 		return raw;
 	}
 
-	public Set<Integer> updateAndReturnRecipients(UserRepository userRepository) {
-		return type.updateAndReturnRecipients(fromUser, toUser, userRepository);
+	public Set<Integer> updateAndReturnRecipients(Set<Integer> allConnected, UserRepository userRepository) {
+		return type.updateAndReturnRecipients(fromUser, toUser, allConnected, userRepository);
 	}
 }

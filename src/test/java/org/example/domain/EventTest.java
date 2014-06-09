@@ -6,6 +6,8 @@ import static org.hamcrest.Matchers.is;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collections;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -28,7 +30,7 @@ public class EventTest {
 	@Test
 	public void managesRecipients() {
 		when(userRepository.get(3)).thenReturn(user);
-		assertThat(new Event("1|F|2|3").updateAndReturnRecipients(userRepository), containsInAnyOrder(3));
+		assertThat(new Event("1|F|2|3").updateAndReturnRecipients(Collections.<Integer>emptySet(), userRepository), containsInAnyOrder(3));
 		verify(user).addFollower(2);
 	}
 

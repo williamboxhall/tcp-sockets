@@ -1,5 +1,6 @@
 package org.example.domain;
 
+import static java.util.Arrays.asList;
 import static org.example.domain.EventType.BROADCAST;
 import static org.example.domain.EventType.FOLLOW;
 import static org.example.domain.EventType.PRIVATE_MESSAGE;
@@ -12,6 +13,9 @@ import static org.hamcrest.Matchers.hasItems;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -20,6 +24,7 @@ public class EventTypeTest {
 	private static final int PAUL = 12;
 	private static final int GEORGE = 56;
 	private static final int RINGO = 78;
+	private static final Set<Integer> ALL_CONNECTED = new HashSet<>(asList(GEORGE, RINGO));
 
 	private UserRepository userRepository;
 
@@ -35,30 +40,30 @@ public class EventTypeTest {
 	@Test
 	public void followNotifiesAndAddsFollowerToUser() {
 		assertThat(userRepository.get(JOHN).followers(), not(hasItems(PAUL)));
-		assertThat(FOLLOW.updateAndReturnRecipients(PAUL, JOHN, userRepository), is(containsInAnyOrder(JOHN)));
+		assertThat(FOLLOW.updateAndReturnRecipients(PAUL, JOHN, ALL_CONNECTED, userRepository), is(containsInAnyOrder(JOHN)));
 		assertThat(userRepository.get(JOHN).followers(), hasItems(PAUL));
 	}
 
 	@Test
 	public void unfollowRemovesFollowerAndNotifiesNobody() {
 		assertThat(userRepository.get(JOHN).followers(), hasItems(GEORGE));
-		assertThat(UNFOLLOW.updateAndReturnRecipients(GEORGE, JOHN, userRepository), is(empty()));
+		assertThat(UNFOLLOW.updateAndReturnRecipients(GEORGE, JOHN, ALL_CONNECTED, userRepository), is(empty()));
 		assertThat(userRepository.get(JOHN).followers(), not(hasItems(GEORGE)));
 	}
 
 	@Test
 	public void broadcastNotifiesEverybody() {
-		assertThat(BROADCAST.updateAndReturnRecipients(null, null, userRepository), is(containsInAnyOrder(JOHN, PAUL, GEORGE, RINGO)));
+		assertThat(BROADCAST.updateAndReturnRecipients(null, null, ALL_CONNECTED, userRepository), is(ALL_CONNECTED));
 	}
 
 	@Test
 	public void privateMessageNotifiesRecipient() {
-		assertThat(PRIVATE_MESSAGE.updateAndReturnRecipients(null, RINGO, userRepository), is(containsInAnyOrder(RINGO)));
+		assertThat(PRIVATE_MESSAGE.updateAndReturnRecipients(null, RINGO, ALL_CONNECTED, userRepository), is(containsInAnyOrder(RINGO)));
 	}
 
 	@Test
 	public void statusUpdateNotifiesFollowers() {
-		assertThat(STATUS_UPDATE.updateAndReturnRecipients(JOHN, null, userRepository), is(containsInAnyOrder(GEORGE, RINGO)));
+		assertThat(STATUS_UPDATE.updateAndReturnRecipients(JOHN, null, ALL_CONNECTED, userRepository), is(containsInAnyOrder(GEORGE, RINGO)));
 	}
 
 	@Test

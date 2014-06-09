@@ -9,39 +9,38 @@ import java.util.Set;
 
 public enum EventType {
 	FOLLOW("F") {
-		Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, UserRepository userRepository) {
+		Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, Set<Integer> allConnected, UserRepository userRepository) {
 			userRepository.get(toUser).addFollower(fromUser);
 			return singleton(toUser);
 		}
 	},
 	UNFOLLOW("U") {
 		@Override
-		Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, UserRepository userRepository) {
+		Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, Set<Integer> allConnected, UserRepository userRepository) {
 			userRepository.get(toUser).removeFollower(fromUser);
 			return emptySet();
 		}
 	},
 	BROADCAST("B") {
 		@Override
-		Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, UserRepository userRepository) {
-			return userRepository.allUserIds();
+		Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, Set<Integer> allConnected, UserRepository userRepository) {
+			return allConnected;
 		}
 	},
 	PRIVATE_MESSAGE("P") {
 		@Override
-		Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, UserRepository userRepository) {
+		Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, Set<Integer> allConnected, UserRepository userRepository) {
 			return singleton(toUser);
 		}
-
 	},
 	STATUS_UPDATE("S") {
 		@Override
-		Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, UserRepository userRepository) {
+		Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, Set<Integer> allConnected, UserRepository userRepository) {
 			return userRepository.get(fromUser).followers();
 		}
 	};
 
-	abstract Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, UserRepository userRepository);
+	abstract Set<Integer> updateAndReturnRecipients(Integer fromUser, Integer toUser, Set<Integer> allConnected, UserRepository userRepository);
 
 	private static final Map<String, EventType> CACHE_BY_ID = new HashMap<>();
 
