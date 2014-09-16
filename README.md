@@ -1,4 +1,4 @@
-# Follower Maze
+# TCP Sockets
 
 A system which acts as a socket server, reading events from an *event source*
 and forwarding them when appropriate to *user clients*.
